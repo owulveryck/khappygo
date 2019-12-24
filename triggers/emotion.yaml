@@ -1,0 +1,15 @@
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: emotion
+spec:
+  broker: default
+  filter:
+    attributes:
+      type: image.partial.png
+      element: face
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: emotion-service
