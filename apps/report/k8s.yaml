@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report
+spec:
+  replicas: 1
+  selector:
+    matchLabels: &labels
+      app: report
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      containers:
+        - name: report
+          image: gcr.io/{{PROJECT_ID}}/report:{{VERSION}}
+          env:
+          - name: BUCKET
+            value: "gs://khappygo/processed"
+
+---
+
+# Service pointing at the previous Deployment. This will be the target for event
+# consumption.
+  kind: Service
+  apiVersion: v1
+  metadata:
+    name: report-service
+  spec:
+    selector:
+      app: report
+    ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+

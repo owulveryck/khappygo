@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yolo
+spec:
+  replicas: 1
+  selector:
+    matchLabels: &labels
+      app: yolo
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      containers:
+        - name: yolo
+          image: gcr.io/{{PROJECT_ID}}/yolo:{{VERSION}}
+          env:
+          - name: MODEL
+            value: "gs://khappygo/models/model.onnx"
+
+---
+
+# Service pointing at the previous Deployment. This will be the target for event
+# consumption.
+  kind: Service
+  apiVersion: v1
+  metadata:
+    name: yolo-service
+  spec:
+    selector:
+      app: yolo
+    ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+
