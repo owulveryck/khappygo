@@ -1,19 +1,22 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/gob"
 	"errors"
-	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	"cloud.google.com/go/storage"
 	cloudevents "github.com/cloudevents/sdk-go"
+	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/knative/eventing-contrib/pkg/kncloudevents"
 	"github.com/owulveryck/gofaces"
 	"github.com/owulveryck/onnx-go"
 	"github.com/owulveryck/onnx-go/backend"
@@ -71,34 +74,39 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	c := &carrier{
-		storageClient: client,
-		model:         m,
-		backend:       backend,
-	}
-	kclient, err := kncloudevents.NewDefaultClient()
+	kclient, err := newDefaultClient()
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
+	}
+	c := &carrier{
+		cloudeventsClient: kclient,
+		storageClient:     client,
+		model:             m,
+		backend:           backend,
 	}
 	log.Println("save is listening for events")
 	log.Fatal(kclient.StartReceiver(context.Background(), c.receive))
 }
 
 type carrier struct {
-	storageClient *storage.Client
-	model         *onnx.Model
-	backend       backend.ComputationBackend
+	cloudeventsClient cloudevents.Client
+	storageClient     *storage.Client
+	model             *onnx.Model
+	backend           backend.ComputationBackend
 }
 
 func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
+	log.Println(event.String())
 	var imgPath string
 	err := event.DataAs(&imgPath)
 	if err != nil {
+		log.Println(err)
 		response.Error(http.StatusBadRequest, "expected data to be a string")
 		return errors.New("expected data to be a string")
 	}
 	imageURL, err := url.Parse(imgPath)
 	if err != nil {
+		log.Println(err)
 		response.Error(http.StatusBadRequest, err.Error())
 		return err
 	}
@@ -110,6 +118,7 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 	object := strings.Trim(imageURL.Path, "/")
 	rc, err := c.storageClient.Bucket(bucket).Object(object).NewReader(ctx)
 	if err != nil {
+		log.Println(err)
 		response.Error(http.StatusBadRequest, err.Error())
 		return err
 	}
@@ -117,23 +126,30 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 
 	inputT, err := gofaces.GetTensorFromImage(rc)
 	if err != nil {
-		response.Error(http.StatusBadRequest, err.Error())
+		log.Println(err)
+		response.Error(http.StatusInternalServerError, err.Error())
 		return err
 	}
 	c.model.SetInput(0, inputT)
 	err = c.backend.Run()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		response.Error(http.StatusInternalServerError, err.Error())
+		return err
 	}
 	outputs, err := c.model.GetOutputTensors()
 
 	boxes, err := gofaces.ProcessOutput(outputs[0].(*tensor.Dense))
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		response.Error(http.StatusInternalServerError, err.Error())
+		return err
 	}
 	boxes = gofaces.Sanitize(boxes)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		response.Error(http.StatusInternalServerError, err.Error())
+		return err
 	}
 
 	for i := 1; i < len(boxes); i++ {
@@ -141,16 +157,55 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 			boxes = boxes[:i]
 			//continue
 		}
-		/*
-			if boxes[i].Classes[0].Prob < config.ClassProbaThreshold {
-				boxes = boxes[:i]
-				continue
-			}
-		*/
 	}
 	for i := 1; i < len(boxes); i++ {
+		var buf bytes.Buffer
+		enc := gob.NewEncoder(&buf)
+		err := enc.Encode(imgPath)
+		if err != nil {
+			log.Println(err)
+			response.Error(http.StatusInternalServerError, err.Error())
+			return err
+		}
+		err = enc.Encode(boxes[i])
+		if err != nil {
+			log.Println(err)
+			response.Error(http.StatusInternalServerError, err.Error())
+			return err
+		}
+		data := buf.Bytes()
+		for _, element := range boxes[i].Elements {
+			newEvent := cloudevents.NewEvent()
+			newEvent.Context = event.Context.Clone()
+			newEvent.SetType("boundingbox")
+			newEvent.SetID(uuid.New().String())
+			newEvent.SetSource("yolo")
+			newEvent.SetData(data)
+			newEvent.SetExtension("element", element)
+			_, _, err := c.cloudeventsClient.Send(ctx, newEvent)
+			if err != nil {
+				log.Println(err)
+				response.Error(http.StatusInternalServerError, err.Error())
+				return err
+			}
+		}
 	}
-
-	fmt.Println(boxes)
+	response.RespondWith(http.StatusOK, nil)
 	return nil
+}
+
+func (c *carrier) getElement(ctx context.Context, imgPath string) (io.ReadCloser, error) {
+	imageURL, err := url.Parse(imgPath)
+	if err != nil {
+		return nil, err
+	}
+	switch imageURL.Scheme {
+	case "gs":
+		bucket := imageURL.Host
+		object := strings.Trim(imageURL.Path, "/")
+		return c.storageClient.Bucket(bucket).Object(object).NewReader(ctx)
+	case "file":
+		return os.Open(imageURL.Host + imageURL.Path)
+	}
+	return nil, nil
 }
