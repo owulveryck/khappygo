@@ -47,7 +47,7 @@ digraph G {
                                                                         }" shape=Mrecord];
                 entry -> event1;
                 event1 -> trigger1;
-                trigger1 [style=filled fillcolor=firebrick1 label="{Trigger|
+                trigger1 [href="triggers/yolo.yaml" style=filled fillcolor=firebrick1 label="{yolo.yaml|
                                                                                 {Filter|{
                                                                                         {type|image.png}
                                                                                         }}|
@@ -95,7 +95,7 @@ digraph G {
                 yolo -> event21;
                 yolo -> event22;
                 yolo -> event23;
-                trigger2 [style=filled fillcolor=firebrick1 label="{Trigger|
+                trigger2 [style=filled fillcolor=firebrick1 label="{image-extractor.yaml|
                                                                                 {Filter|{
                                                                                         {type|boundingbox}
                                                                                         }}|
@@ -139,7 +139,7 @@ digraph G {
                 imageExtractor -> event31;
                 imageExtractor -> event32;
                 imageExtractor -> event33;
-                trigger3 [style=filled fillcolor=firebrick1 label="{Trigger|
+                trigger3 [style=filled fillcolor=firebrick1 label="{emotion.yaml|
                                                                                 {Filter|{
                                                                                         {type|image.partial.png}|
                                                                                         {element|face}
@@ -158,10 +158,10 @@ digraph G {
                                                                                 {data: src=gs://khappygo/processed/1234/img123_3_face.png\n
                                                                                       emotions: ['happiness','...']}
                                                                         }" shape=Mrecord];
-                trigger4 [style=filled fillcolor=firebrick1 label="{Trigger|
+                trigger4 [style=filled fillcolor=firebrick1 label="{report.yaml|
                                                                                 {Filter|{
                                                                                         {type|emotion}|
-                                                                                        }}
+                                                                                        }}|
                                                                                 {Subscriber|report-service}
                                                                         }" shape=Mrecord];
                 event43 -> trigger4;
