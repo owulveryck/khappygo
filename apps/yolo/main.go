@@ -28,6 +28,7 @@ type configuration struct {
 	ConfidenceThreshold float64 `envconfig:"confidence_threshold" default:"0.10" required:"true"`
 	ClassProbaThreshold float64 `envconfig:"proba_threshold" default:"0.90" required:"true"`
 	Model               string  `envconfig:"model" required:"true"`
+	Broker              string  `envconfig:"broker" required:"true"`
 }
 
 var (
@@ -74,7 +75,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	kclient, err := newDefaultClient()
+	kreceiver, err := newDefaultClient()
+	if err != nil {
+		log.Fatal("Failed to create client, ", err)
+	}
+	kclient, err := newDefaultClient(config.Broker)
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
 	}
@@ -85,7 +90,7 @@ func main() {
 		backend:           backend,
 	}
 	log.Println("save is listening for events")
-	log.Fatal(kclient.StartReceiver(context.Background(), c.receive))
+	log.Fatal(kreceiver.StartReceiver(context.Background(), c.receive))
 }
 
 type carrier struct {
@@ -104,19 +109,7 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		response.Error(http.StatusBadRequest, "expected data to be a string")
 		return errors.New("expected data to be a string")
 	}
-	imageURL, err := url.Parse(imgPath)
-	if err != nil {
-		log.Println(err)
-		response.Error(http.StatusBadRequest, err.Error())
-		return err
-	}
-	if imageURL.Scheme != "gs" {
-		response.Error(http.StatusBadRequest, "Only model stored on Google Storage are supported")
-		return errors.New("Only model stored on Google Storage are supported")
-	}
-	bucket := imageURL.Host
-	object := strings.Trim(imageURL.Path, "/")
-	rc, err := c.storageClient.Bucket(bucket).Object(object).NewReader(ctx)
+	rc, err := c.getElement(ctx, imgPath)
 	if err != nil {
 		log.Println(err)
 		response.Error(http.StatusBadRequest, err.Error())
