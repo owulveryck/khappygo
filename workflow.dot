@@ -1,0 +1,172 @@
+digraph G {
+        rank = LR;
+        subgraph cluster_0 {
+                style=filled;
+                color=lightgrey;
+                label = "legende";
+                bucket_legende [style=filled fillcolor=yellow label="cloud storage\nbucket" shape=invtrapezium];
+                cloudEvent_legende [style=filled fillcolor=cyan label="{Cloud Event|
+                                                                                {type:type}|
+                                                                                {Data:data}|
+                                                                                ...
+                                                                        }" shape=Mrecord];
+                application_legende [style=filled fillcolor=green label="application" shape=box3d];
+                broker_legende [style=filled fillcolor=firebrick1 label="broker" shape=hexagon];
+                channel_legende [style=filled fillcolor=firebrick1 label="channel" shape=assembly];
+                broker_legende -> channel_legende[color=firebrick1,penwidth=3.0];
+                trigger_legende [style=filled fillcolor=firebrick1 label="{Trigger|
+                                                                                {Filter|{
+                                                                                        {attribute1|value1}|
+                                                                                        {attribute2|value2}|
+                                                                                        ...
+                                                                                        }}|
+                                                                                {Subscriber|subscriber1}
+                                                                        }" shape=Mrecord];
+        }
+
+
+        subgraph cluster_1 {
+                subgraph cluster_11 {
+                        style=filled;
+                        color=firebrick1;
+                        label = "event source";
+                        entry [style=filled fillcolor=yellow label="khappygo/input/\n\n" shape=invtrapezium];
+                }
+                yolo [style=filled fillcolor=green label="YOLOv2\nMODEL=gs://khappygo/models/model.onnx" shape=box3d];
+                modelBkt [style=filled fillcolor=yellow label="khappygo/models/\n\n" shape=invtrapezium];
+                imageExtractor [style=filled fillcolor=green label="image-extractor\nDEST=gs://khappygo/processed" shape=box3d];
+                processedBkt [style=filled fillcolor=yellow label="khappygo/processed/\n\n" shape=invtrapezium];
+                emotion [style=filled fillcolor=green label="Emotion-FER+\nMODEL=gs://khappygo/models/emotion.onnx" shape=box3d];
+                report [style=filled fillcolor=green label="Report\nBUCKET=gs://khappygo/processed" shape=box3d];
+                event1 [style=filled fillcolor=cyan label="{Cloud Event|
+                                                                                {id:abc}|
+                                                                                {type:image.png}|
+                                                                                {source:khapygo/input}|
+                                                                                {correlationID:1234}|
+                                                                                {data: src=gs://khappygo/input/img123.png}
+                                                                        }" shape=Mrecord];
+                entry -> event1;
+                event1 -> trigger1;
+                trigger1 [style=filled fillcolor=firebrick1 label="{Trigger|
+                                                                                {Filter|{
+                                                                                        {type|image.png}
+                                                                                        }}|
+                                                                                {Subscriber|yolo-service}
+                                                                        }" shape=Mrecord];
+                trigger1 -> yolo;
+                modelBkt -> yolo [color=green label="reading from"];
+                event20 [href="https://godoc.org/github.com/owulveryck/gofaces#Box" style=filled fillcolor=cyan label="{Cloud Event|
+                                                                                {type:boundingbox}|
+                                                                                {source:yolo}|
+                                                                                {correlationID:1234}|
+                                                                                {element:chair}|
+                                                                                {data: src=gs://khappygo/input/img123.png\n
+                                                                                        binary_representation_box
+                                                                                }
+                                                                        }" shape=Mrecord];
+                event21 [href="https://godoc.org/github.com/owulveryck/gofaces#Box" style=filled fillcolor=cyan label="{Cloud Event|
+                                                                                {type:boundingbox}|
+                                                                                {source:yolo}|
+                                                                                {correlationID:1234}|
+                                                                                {element:bike}|
+                                                                                {data: src=gs://khappygo/input/img123.png\n
+                                                                                        binary_representation_box
+                                                                                }
+                                                                        }" shape=Mrecord];
+                event22 [href="https://godoc.org/github.com/owulveryck/gofaces#Box" style=filled fillcolor=cyan label="{Cloud Event|
+                                                                                {type:boundingbox}|
+                                                                                {source:yolo}|
+                                                                                {correlationID:1234}|
+                                                                                {element:bike}|
+                                                                                {data: src=gs://khappygo/input/img123.png\n
+                                                                                        binary_representation_box
+                                                                                }
+                                                                        }" shape=Mrecord];
+                event23 [href="https://godoc.org/github.com/owulveryck/gofaces#Box" style=filled fillcolor=cyan label="{Cloud Event|
+                                                                                {type:boundingbox}|
+                                                                                {source:yolo}|
+                                                                                {correlationID:1234}|
+                                                                                {element:face}|
+                                                                                {data: src=gs://khappygo/input/img123.png\n
+                                                                                        binary_representation_box
+                                                                                }
+                                                                        }" shape=Mrecord];
+                yolo -> event20;
+                yolo -> event21;
+                yolo -> event22;
+                yolo -> event23;
+                trigger2 [style=filled fillcolor=firebrick1 label="{Trigger|
+                                                                                {Filter|{
+                                                                                        {type|boundingbox}
+                                                                                        }}|
+                                                                                {Subscriber|image-extractor}
+                                                                        }" shape=Mrecord];
+                event20 -> trigger2;
+                event21 -> trigger2;
+                event22 -> trigger2;
+                event23 -> trigger2;
+                imageExtractor -> processedBkt [color=red label="writing to"];
+                trigger2 -> imageExtractor;
+                event30 [style=filled fillcolor=cyan label="{Cloud Event|
+                                                                                {type:image.partial.png}|
+                                                                                {source:image-extractor}|
+                                                                                {correlationID:1234}|
+                                                                                {element:chair}|
+                                                                                {data: src=gs://khappygo/processed/1234/img123_0_chair.png}
+                                                                        }" shape=Mrecord];
+                event31 [style=filled fillcolor=cyan label="{Cloud Event|
+                                                                                {type:image.partial.png}|
+                                                                                {source:image-extractor}|
+                                                                                {correlationID:1234}|
+                                                                                {element:bike}|
+                                                                                {data: src=gs://khappygo/processed/1234/img123_1_bike.png}
+                                                                        }" shape=Mrecord];
+                event32 [style=filled fillcolor=cyan label="{Cloud Event|
+                                                                                {type:image.partial.png}|
+                                                                                {source:image-extractor}|
+                                                                                {correlationID:1234}|
+                                                                                {element:bike}|
+                                                                                {data: src=gs://khappygo/processed/1234/img123_2_bike.png}
+                                                                        }" shape=Mrecord];
+                event33 [style=filled fillcolor=cyan label="{Cloud Event|
+                                                                                {type:image.partial.png}|
+                                                                                {source:image-extractor}|
+                                                                                {correlationID:1234}|
+                                                                                {element:face}|
+                                                                                {data: src=gs://khappygo/processed/1234/img123_3_face.png}
+                                                                        }" shape=Mrecord];
+                imageExtractor -> event30;
+                imageExtractor -> event31;
+                imageExtractor -> event32;
+                imageExtractor -> event33;
+                trigger3 [style=filled fillcolor=firebrick1 label="{Trigger|
+                                                                                {Filter|{
+                                                                                        {type|image.partial.png}|
+                                                                                        {element|face}
+                                                                                        }}|
+                                                                                {Subscriber|emotion-service}
+                                                                        }" shape=Mrecord];
+                event33 -> trigger3;
+                trigger3 -> emotion;
+                modelBkt -> emotion [color=green label="reading from"];
+                processedBkt -> emotion [color=green label="reading from"];
+                emotion -> event43;
+                event43 [style=filled fillcolor=cyan label="{Cloud Event|
+                                                                                {type:emotion}|
+                                                                                {source:emotion}|
+                                                                                {correlationID:1234}|
+                                                                                {data: src=gs://khappygo/processed/1234/img123_3_face.png\n
+                                                                                      emotions: ['happiness','...']}
+                                                                        }" shape=Mrecord];
+                trigger4 [style=filled fillcolor=firebrick1 label="{Trigger|
+                                                                                {Filter|{
+                                                                                        {type|emotion}|
+                                                                                        }}
+                                                                                {Subscriber|report-service}
+                                                                        }" shape=Mrecord];
+                event43 -> trigger4;
+                trigger4 -> report;
+                processedBkt2 [style=filled fillcolor=yellow label="khappygo/processed/1234/img123_3_face.html\n...\n" shape=invtrapezium];
+                report -> processedBkt2 [color=red label="writing to"];
+        }
+}
