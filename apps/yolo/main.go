@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"image/jpeg"
 	"io"
 	"io/ioutil"
 	"log"
@@ -17,6 +19,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/owulveryck/gofaces"
 	"github.com/owulveryck/khappygo/apps/internal/box"
+	"github.com/owulveryck/khappygo/apps/internal/kclient"
 	"github.com/owulveryck/onnx-go"
 	"github.com/owulveryck/onnx-go/backend"
 	"github.com/owulveryck/onnx-go/backend/x/gorgonnx"
@@ -74,11 +77,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	kreceiver, err := newDefaultClient()
+	kreceiver, err := kclient.NewDefaultClient()
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
 	}
-	kclient, err := newDefaultClient(config.Broker)
+	kclient, err := kclient.NewDefaultClient(config.Broker)
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
 	}
@@ -114,12 +117,22 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		return err
 	}
 	defer rc.Close()
+	var buf bytes.Buffer
+	tee := io.TeeReader(rc, &buf)
+	jpg, _ := jpeg.Decode(tee)
+	log.Println(jpg.Bounds())
 
-	inputT, err := gofaces.GetTensorFromImage(rc)
+	inputT, err := gofaces.GetTensorFromImage(&buf)
 	if err != nil {
 		log.Println(err)
 		response.Error(http.StatusInternalServerError, err.Error())
 		return err
+	}
+	ratioX := float64(jpg.Bounds().Max.X) / float64(inputT.Shape()[1])
+	ratioY := float64(jpg.Bounds().Max.Y) / float64(inputT.Shape()[2])
+	ratio := ratioY
+	if ratioX > ratioY {
+		ratio = ratioX
 	}
 	c.model.SetInput(0, inputT)
 	err = c.backend.Run()
@@ -147,12 +160,14 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 	for i := 0; i < len(boxes); i++ {
 		if boxes[i].Confidence >= config.ConfidenceThreshold {
 			output = append(output, box.Box{
+				Src:        imgPath,
+				ID:         i,
 				Element:    boxes[i].Elements[0].Class,
 				Confidence: boxes[i].Confidence,
-				X0:         boxes[i].R.Min.X,
-				Y0:         boxes[i].R.Min.Y,
-				X1:         boxes[i].R.Max.X,
-				Y1:         boxes[i].R.Max.Y,
+				X0:         int(float64(boxes[i].R.Min.X) * ratio),
+				Y0:         int(float64(boxes[i].R.Min.Y) * ratio),
+				X1:         int(float64(boxes[i].R.Max.X) * ratio),
+				Y1:         int(float64(boxes[i].R.Max.Y) * ratio),
 			})
 		}
 	}

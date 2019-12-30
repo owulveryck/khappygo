@@ -1,11 +1,12 @@
-package main
+package kclient
 
 import (
 	cloudevents "github.com/cloudevents/sdk-go"
 	"github.com/cloudevents/sdk-go/pkg/cloudevents/transport/http"
 )
 
-func newDefaultClient(target ...string) (cloudevents.Client, error) {
+// NewDefaultClient copied from the knative project because a little copying is better than a little dependency
+func NewDefaultClient(target ...string) (cloudevents.Client, error) {
 	tOpts := []http.Option{cloudevents.WithBinaryEncoding()}
 	if len(target) > 0 && target[0] != "" {
 		tOpts = append(tOpts, cloudevents.WithTarget(target[0]))

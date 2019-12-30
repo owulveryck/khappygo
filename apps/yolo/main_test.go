@@ -13,14 +13,15 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go"
 	"github.com/google/uuid"
 	"github.com/owulveryck/khappygo/apps/internal/box"
+	"github.com/owulveryck/khappygo/apps/internal/kclient"
 	"github.com/owulveryck/onnx-go"
 	"github.com/owulveryck/onnx-go/backend/x/gorgonnx"
 )
 
 func TestReceive(t *testing.T) {
 	config = configuration{
-		ConfidenceThreshold: 0.10,
-		ClassProbaThreshold: 0.90,
+		ConfidenceThreshold: 0.001,
+		ClassProbaThreshold: 0.50,
 	}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		msg, err := ceventHTTP.NewMessage(r.Header, r.Body)
@@ -57,7 +58,7 @@ func TestReceive(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	kclient, err := newDefaultClient(ts.URL)
+	kclient, err := kclient.NewDefaultClient(ts.URL)
 	if err != nil {
 		t.Fatal("Failed to create client, ", err)
 	}
@@ -70,7 +71,8 @@ func TestReceive(t *testing.T) {
 	newEvent.SetSource("test")
 	newEvent.SetType("image.png")
 	newEvent.SetID(uuid.New().String())
-	newEvent.SetData("file://meme.jpg")
+	//newEvent.SetData("file://../testdata/meme.jpg")
+	newEvent.SetData("file://../testdata/100k-ai-faces-1.jpg")
 	var response cloudevents.EventResponse
 	err = c.receive(context.TODO(), newEvent, &response)
 	if err != nil {
