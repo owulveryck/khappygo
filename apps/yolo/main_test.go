@@ -33,10 +33,6 @@ func TestReceive(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	kreceiver, err := newDefaultClient()
-	if err != nil {
-		t.Fatal("Failed to create client, ", err)
-	}
 	kclient, err := newDefaultClient(ts.URL)
 	if err != nil {
 		t.Fatal("Failed to create client, ", err)
@@ -46,16 +42,14 @@ func TestReceive(t *testing.T) {
 		model:             m,
 		backend:           backend,
 	}
-	go func() {
-		kreceiver.StartReceiver(context.Background(), c.receive)
-	}()
 	time.Sleep(5 * time.Second)
 	newEvent := cloudevents.NewEvent()
 	newEvent.SetSource("test")
 	newEvent.SetType("image.png")
 	newEvent.SetID(uuid.New().String())
 	newEvent.SetData("file://WomaninaCrowd_400.jpg")
-	_, response, err := c.cloudeventsClient.Send(context.Background(), newEvent)
+	var response cloudevents.EventResponse
+	err = c.receive(context.TODO(), newEvent, &response)
 	if err != nil {
 		t.Fatal(err)
 	}
