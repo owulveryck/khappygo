@@ -17,6 +17,7 @@ import (
 	"cloud.google.com/go/storage"
 	cloudevents "github.com/cloudevents/sdk-go"
 	"github.com/disintegration/imaging"
+	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/owulveryck/khappygo/apps/internal/box"
 	"github.com/owulveryck/khappygo/apps/internal/kclient"
@@ -82,7 +83,8 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		return err
 	}
 	cropped := imaging.Crop(img, image.Rect(b.X0, b.Y0, b.X1, b.Y1))
-	w, err := c.postElement(ctx, filepath.Join(config.Dest, name+"_"+strconv.Itoa(b.ID)+"_"+b.Element+extension))
+	imgPath := filepath.Join(config.Dest, name+"_"+strconv.Itoa(b.ID)+"_"+b.Element+extension)
+	w, err := c.postElement(ctx, imgPath)
 	if err != nil {
 		log.Println(err)
 		response.Error(http.StatusInternalServerError, "save picture"+err.Error())
@@ -95,6 +97,14 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		response.Error(http.StatusInternalServerError, "save picture"+err.Error())
 		return err
 	}
+
+	newEvent := cloudevents.NewEvent()
+	newEvent.SetID(uuid.New().String())
+	newEvent.SetSource("image-extractor")
+	newEvent.SetType("image.partial.png")
+	newEvent.SetExtension("element", b.Element)
+	newEvent.SetData(imgPath)
+	response.RespondWith(200, &newEvent)
 	return nil
 }
 func (c *carrier) getElement(ctx context.Context, imgPath string) (io.ReadCloser, error) {
