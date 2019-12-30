@@ -2,24 +2,48 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
+
+	ceventHTTP "github.com/cloudevents/sdk-go/pkg/cloudevents/transport/http"
+
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	cloudevents "github.com/cloudevents/sdk-go"
 	"github.com/google/uuid"
+	"github.com/owulveryck/khappygo/apps/internal/box"
 	"github.com/owulveryck/onnx-go"
 	"github.com/owulveryck/onnx-go/backend/x/gorgonnx"
 )
 
 func TestReceive(t *testing.T) {
+	config = configuration{
+		ConfidenceThreshold: 0.10,
+		ClassProbaThreshold: 0.90,
+	}
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(r)
+		msg, err := ceventHTTP.NewMessage(r.Header, r.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		cdc := &ceventHTTP.Codec{
+			Encoding: ceventHTTP.BinaryV1,
+		}
+		event, err := cdc.Decode(r.Context(), msg)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var b box.Box
+		err = event.DataAs(&b)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Log(b)
+
 	}))
 	defer ts.Close()
+	//b, err := ioutil.ReadFile("../../models/tinyyolov2.onnx")
 	b, err := ioutil.ReadFile("../../models/faces.onnx")
 	if err != nil {
 		t.Fatal(err)
@@ -42,12 +66,11 @@ func TestReceive(t *testing.T) {
 		model:             m,
 		backend:           backend,
 	}
-	time.Sleep(5 * time.Second)
 	newEvent := cloudevents.NewEvent()
 	newEvent.SetSource("test")
 	newEvent.SetType("image.png")
 	newEvent.SetID(uuid.New().String())
-	newEvent.SetData("file://WomaninaCrowd_400.jpg")
+	newEvent.SetData("file://meme.jpg")
 	var response cloudevents.EventResponse
 	err = c.receive(context.TODO(), newEvent, &response)
 	if err != nil {

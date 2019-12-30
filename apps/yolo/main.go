@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/gob"
 	"errors"
 	"io"
 	"io/ioutil"
@@ -18,6 +16,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/owulveryck/gofaces"
+	"github.com/owulveryck/khappygo/apps/internal/box"
 	"github.com/owulveryck/onnx-go"
 	"github.com/owulveryck/onnx-go/backend"
 	"github.com/owulveryck/onnx-go/backend/x/gorgonnx"
@@ -101,7 +100,6 @@ type carrier struct {
 }
 
 func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
-	log.Println(event.String())
 	var imgPath string
 	err := event.DataAs(&imgPath)
 	if err != nil {
@@ -145,43 +143,36 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		return err
 	}
 
-	for i := 1; i < len(boxes); i++ {
-		if boxes[i].Confidence < config.ConfidenceThreshold {
-			boxes = boxes[:i]
-			//continue
+	output := make([]box.Box, 0)
+	for i := 0; i < len(boxes); i++ {
+		if boxes[i].Confidence >= config.ConfidenceThreshold {
+			output = append(output, box.Box{
+				Element:    boxes[i].Elements[0].Class,
+				Confidence: boxes[i].Confidence,
+				X0:         boxes[i].R.Min.X,
+				Y0:         boxes[i].R.Min.Y,
+				X1:         boxes[i].R.Max.X,
+				Y1:         boxes[i].R.Max.Y,
+			})
 		}
 	}
-	for i := 1; i < len(boxes); i++ {
-		var buf bytes.Buffer
-		enc := gob.NewEncoder(&buf)
-		err := enc.Encode(imgPath)
+	for i := 0; i < len(output); i++ {
+		element := output[i].Element
+		//		for _, element := range output[i].Elements {
+		newEvent := cloudevents.NewEvent("1.0")
+		newEvent.Context = event.Context.Clone()
+		newEvent.SetType("boundingbox")
+		newEvent.SetID(uuid.New().String())
+		newEvent.SetSource("yolo")
+		newEvent.SetData(output[i])
+		newEvent.SetExtension("element", element)
+		_, _, err = c.cloudeventsClient.Send(ctx, newEvent)
 		if err != nil {
 			log.Println(err)
 			response.Error(http.StatusInternalServerError, err.Error())
 			return err
 		}
-		err = enc.Encode(boxes[i])
-		if err != nil {
-			log.Println(err)
-			response.Error(http.StatusInternalServerError, err.Error())
-			return err
-		}
-		data := buf.Bytes()
-		for _, element := range boxes[i].Elements {
-			newEvent := cloudevents.NewEvent()
-			newEvent.Context = event.Context.Clone()
-			newEvent.SetType("boundingbox")
-			newEvent.SetID(uuid.New().String())
-			newEvent.SetSource("yolo")
-			newEvent.SetData(data)
-			newEvent.SetExtension("element", element)
-			_, _, err := c.cloudeventsClient.Send(ctx, newEvent)
-			if err != nil {
-				log.Println(err)
-				response.Error(http.StatusInternalServerError, err.Error())
-				return err
-			}
-		}
+		//		}
 	}
 	response.RespondWith(http.StatusOK, nil)
 	return nil
