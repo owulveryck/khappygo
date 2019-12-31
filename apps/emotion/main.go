@@ -17,6 +17,7 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go"
 	"github.com/disintegration/imaging"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/owulveryck/khappygo/apps/internal/emotions"
 	"github.com/owulveryck/khappygo/apps/internal/kclient"
 	"github.com/owulveryck/onnx-go"
 	"github.com/owulveryck/onnx-go/backend"
@@ -109,15 +110,13 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 	defer rc.Close()
 	jpg, _ := jpeg.Decode(rc)
 
-	log.Println(jpg.Bounds())
-	height := 28
-	width := 28
+	height := 64
+	width := 64
 	inputT := tensor.New(tensor.WithShape(1, 1, height, width), tensor.Of(tensor.Float32))
 
 	m := imaging.Resize(jpg, height, width, imaging.Lanczos)
 
 	var imgGray *image.Gray
-	// convert to gray
 	gray := imaging.Grayscale(m)
 	imgGray = image.NewGray(gray.Bounds())
 	for i := 0; i < len(imgGray.Pix); i++ {
@@ -139,8 +138,24 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		return err
 	}
 	outputs, err := c.model.GetOutputTensors()
+	if err != nil {
+		log.Println(err)
+		response.Error(http.StatusInternalServerError, err.Error())
+		return err
+	}
+	emotionT := outputs[0].Data().([]float32)
+	emotions := emotions.Emotion{
+		Neutral:   emotionT[0],
+		Happiness: emotionT[1],
+		Surprise:  emotionT[2],
+		Sadness:   emotionT[3],
+		Anger:     emotionT[4],
+		Disgust:   emotionT[5],
+		Feat:      emotionT[6],
+		Contempt:  emotionT[7],
+	}
 
-	log.Println(outputs)
+	log.Printf("%#v", emotions)
 
 	response.RespondWith(http.StatusOK, nil)
 	return nil
