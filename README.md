@@ -16,3 +16,8 @@ git lfs install
 git lfs fetch
 git lfs checkout model/model.onnx
 ```
+
+# Slides
+
+The slides are in progress.
+They are in the present format an best viewed with `github.com/owulveryck/present`

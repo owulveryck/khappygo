@@ -30,21 +30,42 @@ A la différence des autres produits, ce service ne demande *pas* *d'interractio
 
 * Le data-scientist
 
-le data scientist:
+le data scientist travaille les données et leur applique des modèles mathématiques pour en extraire le maximum de valeur.
+
 .html perso-data-scientist.html
 
 * Le Développeur
 
-le développeur
+le développeur code des applications informatiques. Son rôle est de produire du code de qualité pour répondre aux enjeux métiers.
+
+Il produit des applications.
 .html perso-dev.html
 
 * L'Ops
 
-l'Ops
+Son travail est de fournir le socle qui permette aux applications de s'exécuter dans les meilleurs conditions de fiabilité.
+Il fournit, entre autre, une plateforme d'hébergement élastique, et s'occupe de toute l'infrastructure.
 .html perso-ops.html
 
+* L'application
 
+* Une appication distribuée
 
+L'aplication est composée de plusieurs _micro_ _services_:
+
+- un service de localisation des visages sur une image
+- un service de découpe des visages
+- un service d'analyse de sentiment par visage
+- un service de reporting
+
+* "data-science"
+
+* Trouver les visages
+
+Nous utilisons le modèle _YOLO_.
+YOLO est un réseau de neurones qui permet la détection multi-objets.
+
+.link https://pjreddie.com/darknet/yolo/
 * logos
 
 .image assets/Kubernetes_logo_without_workmark.png 60 _
