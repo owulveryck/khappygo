@@ -14,3 +14,8 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 .envrc
+
+apps/emotion/emotion
+apps/image-extractor/image-extractor
+apps/yolo/yolo
+apps/report/report
