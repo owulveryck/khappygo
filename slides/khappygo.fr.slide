@@ -1,0 +1,59 @@
+Khappygo
+Deep learning en production
+
+Olivier Wulveryck
+Consultant
+owulveryck@octo.com
+https://github.com/owulveryck/khappygo
+@owulveryck
+
+* Agenda
+
+* La société "RUH" (Are You Happy?)
+
+Afin de satisfaire le besoin des *retailers* *physiques* d'amélioration de l'expérience utilisateur,
+
+la société RUH propose un service de *colecte* et d'*analyse* *de* *sentiments* des clients à la sortie du magasin.
+
+A la différence des autres produits, ce service ne demande *pas* *d'interractions* avec les clients.
+
+.image assets/sad-4730689_640.png _ 300
+
+* Le produit en bref
+
+- récupérer les images des clients à la sortie du magasin;
+- extraire les visages depuis les images;
+- extraire les sentiments depuis les images;
+- stocker les sentiments;
+
+* L'équipe
+
+* Le data-scientist
+
+le data scientist:
+.html perso-data-scientist.html
+
+* Le Développeur
+
+le développeur
+.html perso-dev.html
+
+* L'Ops
+
+l'Ops
+.html perso-ops.html
+
+
+
+* logos
+
+.image assets/Kubernetes_logo_without_workmark.png 60 _
+.caption Kubernetes
+.image assets/knative-logo.png 60 _
+.caption Knative
+.image assets/ONNX_logo_main.png 60 _
+.caption ONNX
+.image assets/Go-Logo_Blue.png 60 _
+.caption Go
+.image assets/gorgonia.svg 60 _
+.caption Gorgonia
