@@ -1,0 +1,45 @@
+Khappygo
+Deep learning in production
+
+Olivier Wulveryck
+Consultant
+owulveryck@octo.com
+https://github.com/owulveryck/khappygo
+@owulveryck
+
+* Agenda
+
+.play -edit ../tmp/main.go
+
+- enum
+- enum2
+
+* slide 2
+
+fdsfds
+fsfdsf
+fdsfds
+
+* slide 3
+
+
+* mathjax
+
+$$\sum_{i=0}^n i^2 = \frac{(n^2+n)(2n+1)}{6}$$
+
+* logo
+
+.image assets/Go-Logo_Blue.png
+
+rest
+
+* next
+
+.image assets/Go-Logo_Blue.png 100 _
+
+rest
+
+* background
+
+.background assets/background.jpg
+

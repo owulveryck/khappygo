@@ -19,3 +19,4 @@ apps/emotion/emotion
 apps/image-extractor/image-extractor
 apps/yolo/yolo
 apps/report/report
+.DS_Store
