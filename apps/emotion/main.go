@@ -151,7 +151,7 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		Sadness:   emotionT[3],
 		Anger:     emotionT[4],
 		Disgust:   emotionT[5],
-		Feat:      emotionT[6],
+		Fear:      emotionT[6],
 		Contempt:  emotionT[7],
 	}
 
