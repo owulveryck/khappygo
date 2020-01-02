@@ -1,0 +1,16 @@
+digraph G {
+        graph [fontname = "Century Gothic"];
+        node [fontname = "Century Gothic"];
+        edge [fontname = "Century Gothic"];
+        compound=true;
+        ranksep=1.25;
+        label="Storage service";
+
+        node [shape=plaintext, fontsize=16];
+
+        bgcolor=white;
+        edge [arrowsize=1, color=black];
+        http [label="Post Request"];
+        webservice [label="HTTP Web Service", shape=box];
+        cloudStorage [image="./assets/Google-Cloud-Storage-Logo.png"];
+}

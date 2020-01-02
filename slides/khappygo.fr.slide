@@ -19,35 +19,31 @@ A la différence des autres produits, ce service ne demande *pas* *d'interractio
 
 .image assets/sad-4730689_640.png _ 300
 
-* Le produit en bref
+* Application design
+
+* Les services
 
 - récupérer les images des clients à la sortie du magasin;
 - extraire les visages depuis les images;
 - extraire les sentiments depuis les images;
 - stocker les sentiments;
 
-* L'équipe
+* La récupération des images
 
-* Le data-scientist
+* La récupération des images
 
-le data scientist travaille les données et leur applique des modèles mathématiques pour en extraire le maximum de valeur.
+Les images sont récupérées par un service web "REST" qui les dépose dans le système Google Cloud Storage.
 
-.html perso-data-scientist.html
+.image service1.svg
 
-* Le Développeur
+* Notre domaine
 
-le développeur code des applications informatiques. Son rôle est de produire du code de qualité pour répondre aux enjeux métiers.
+* Les evenements de notre domaine
 
-Il produit des applications.
-.html perso-dev.html
+Les évènements.
 
-* L'Ops
-
-Son travail est de fournir le socle qui permette aux applications de s'exécuter dans les meilleurs conditions de fiabilité.
-Il fournit, entre autre, une plateforme d'hébergement élastique, et s'occupe de toute l'infrastructure.
-.html perso-ops.html
-
-* L'application
+: if you want to indicate an event that is significant to your domain, raise this event explicitly and let the other classes in your domain model subscribe and react to it.
+: https://enterprisecraftsmanship.com/posts/domain-events-simple-reliable-solution/
 
 * Une appication distribuée
 
@@ -78,3 +74,14 @@ YOLO est un réseau de neurones qui permet la détection multi-objets.
 .caption Go
 .image assets/gorgonia.svg 60 _
 .caption Gorgonia
+
+
+* Domain events
+
+Extrait de la doc [[https://docs.microsoft.com/fr-fr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/domain-events-design-implementation][Domain events design implementation]]
+
+l’interface du bus d’événements a besoin d’une infrastructure permettant une communication entre processus et distribuée entre des services potentiellement distants.
+
+Elle peut reposer sur un bus de services commercial, sur des files d’attente,
+sur une base de données partagée utilisée comme une boîte aux lettres,
+ou sur tout autre système de messagerie distribué et idéalement basé sur les opérations d’envoi (push).
