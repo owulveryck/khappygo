@@ -18,9 +18,12 @@ digraph G {
 
         bgcolor=white;
         edge [arrowsize=1, color=black];
+        subgraph cluster_CloudStorage {
+                label="Google Cloud Storage";
+                cloudStorage [image="../assets/Google-Cloud-Storage-Logo.svg"];
+        };
         http [label="Post Request"];
         webservice [label="HTTP Web Service", shape=box];
-        cloudStorage [image="./assets/Google-Cloud-Storage-Logo.svg"];
         http -> webservice;
         webservice -> cloudStorage;
 }

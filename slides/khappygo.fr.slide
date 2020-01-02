@@ -30,11 +30,38 @@ A la différence des autres produits, ce service ne demande *pas* *d'interractio
 
 * La récupération des images
 
-* La récupération des images
-
 Les images sont récupérées par un service web "REST" qui les dépose dans le système Google Cloud Storage.
 
 .image service1.svg
+
+* Le service de localisation des visages
+
+.image service2.svg
+
+- lit une image depuis un emplacement sur un bucket Cloud storage,
+- applique un modèle de deep learning pour localiser les visages.
+- génère ensuite _un_évènement_ par visage détecté
+
+
+* Le service d'extraction des images
+
+.image service3.svg
+
+- lit une image
+- extrait les bounding boxes (les visages)
+- stock les images dans cloud storage
+
+* Le service d'analyse de sentiment
+
+.image service4.svg
+
+- lit une image de visage
+- extrait les sentiments en appliquant un modèle de deep-learning
+- génère un évènement avec les sentiments
+
+* Le service de reporting
+
+- génere des enregistrements dans une base de donnée
 
 * Notre domaine
 

@@ -1,0 +1,46 @@
+digraph G {
+        graph [fontname = "Century Gothic"];
+        node [fontname = "Century Gothic"];
+        edge [fontname = "Century Gothic"];
+
+        rankdir = LR;
+        compound=true;
+        ranksep=1.25;
+
+        node [shape=plaintext, fontsize=16, label=""];
+
+        bgcolor=white;
+        edge [arrowsize=1, color=black];
+        graph[penwidth=0, labelloc="b"];
+
+        //label="Storage service";
+
+
+        bgcolor=white;
+        edge [arrowsize=1, color=black];
+        subgraph cluster_CloudStorageSrc {
+                label="Google Cloud Storage";
+                cloudStorageSrc [image="../assets/Google-Cloud-Storage-Logo.svg"];
+        };
+        subgraph cluster_CloudEvents {
+                label="Source: gs://SOURCE\nBounding Box:{x0,y0,x1,y1}";
+                cloudEvent0 [image="../assets/cloudevents.svg"];
+                cloudEvent1 [image="../assets/cloudevents.svg"];
+                cloudEvent2 [image="../assets/cloudevents.svg"];
+        };
+        subgraph cluster_Service {
+                webservice [image="../assets/Go_Logo_Aqua.svg"];
+        };
+        subgraph cluster_ONNX {
+                label="ONNX";
+                onnx [image="../assets/onnx-icon.svg"];
+        };
+
+
+        //webservice [label="Service", shape=box];
+        cloudStorageSrc -> webservice [label="read SOURCE picture"];
+        onnx -> webservice[label="read model"];
+        webservice -> cloudEvent0 [label="event bounding box"];
+        webservice -> cloudEvent1 [label="event bounding box"];
+        webservice -> cloudEvent2 [label="..."];
+}

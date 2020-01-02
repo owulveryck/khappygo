@@ -1,0 +1,46 @@
+digraph G {
+        graph [fontname = "Century Gothic"];
+        node [fontname = "Century Gothic"];
+        edge [fontname = "Century Gothic"];
+
+        rankdir = LR;
+        compound=true;
+        ranksep=1.25;
+
+        node [shape=plaintext, fontsize=16, label=""];
+
+        bgcolor=white;
+        edge [arrowsize=1, color=black];
+        graph[penwidth=0, labelloc="b"];
+
+        //label="Storage service";
+
+
+        bgcolor=white;
+        edge [arrowsize=1, color=black];
+        subgraph cluster_CloudStorage {
+                label="Google Cloud Storage";
+                cloudStorage [image="../assets/Google-Cloud-Storage-Logo.svg"];
+        };
+        subgraph cluster_CloudStorageSrc {
+                label="Google Cloud Storage";
+                cloudStorageSrc [image="../assets/Google-Cloud-Storage-Logo.svg"];
+        };
+        subgraph cluster_CloudEvents {
+                label="Source: gs://...\nBounding Box:{x0,y0,x1,y1}";
+                cloudEvent0 [image="../assets/cloudevents.svg"];
+        };
+        subgraph cluster_CloudEventsDest {
+                label="type: face\nlocation\ngs://SOURCE_face_x.png";
+                cloudEventFace0 [image="../assets/cloudevents.svg"];
+        };
+        subgraph cluster_Service {
+                webservice [image="../assets/Go_Logo_Aqua.svg"];
+        };
+
+        //webservice [label="Service", shape=box];
+        cloudStorageSrc -> webservice[label="read SOURCE file"];
+        cloudEvent0 -> webservice[label="event bounding box"];
+        webservice -> cloudStorage[label="store picture\nSOURCE_face_x.png"];
+        webservice -> cloudEventFace0 [label="generate event"];
+}
