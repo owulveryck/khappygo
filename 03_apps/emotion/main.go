@@ -82,7 +82,7 @@ func main() {
 		model:         m,
 		backend:       backend,
 	}
-	log.Println("save is listening for events")
+	log.Println("emotion is listening for events")
 	log.Fatal(kreceiver.StartReceiver(context.Background(), c.receive))
 }
 

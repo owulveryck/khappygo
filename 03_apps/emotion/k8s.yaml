@@ -16,7 +16,7 @@ spec:
           image: gcr.io/{{PROJECT_ID}}/emotion:{{VERSION}}
           env:
           - name: MODEL
-            value: "gs://khappygo/models/model.onnx"
+            value: "gs://khappygo/models/emotions.onnx"
 
 ---
 

@@ -6,7 +6,7 @@ do
 		sed -i_ "s|$svgFile|data:image/svg+xml;base64,$base64File|" $1
 done
 
-egrep -o "./assets/.*png" $1 | while read pngFile
+egrep -o "../assets/.*png" $1 | while read pngFile
 do
 		base64File=$(cat $pngFile | base64)
 		sed -i_ "s|$pngFile|data:image/png;base64,$base64File|" $1

@@ -1,0 +1,63 @@
+digraph G {
+        graph [fontname = "Century Gothic"];
+        node [fontname = "Century Gothic"];
+        edge [fontname = "Century Gothic"];
+
+        rankdir = LR;
+        compound=true;
+        ranksep=1.25;
+
+        node [shape=plaintext, fontsize=16, label=""];
+
+        bgcolor=white;
+        edge [arrowsize=1, color=black];
+
+        //label="Storage service";
+        graph[penwidth=0, labelloc="b"];
+
+
+        bgcolor=white;
+        edge [arrowsize=1, color=black];
+        subgraph cluster_EventSource {
+                graph[penwidth=1, labelloc="b"];
+                label="Event source";
+                subgraph cluster_CloudStorage {
+                        bgcolor="#ff00005f"
+                        graph[penwidth=0, labelloc="b"];
+                        label="Google Cloud Storage";
+                        cloudStorage [image="../assets/Google-Cloud-Storage-Logo.svg"];
+                };
+        };
+        subgraph cluster_Kubernetes {
+                bgcolor="#0000ff5f"
+                graph[penwidth=1, labelloc="b"];
+                label="Kubernetes"
+                subgraph cluster_Serverless {
+                        bgcolor="#ff00005f"
+                        graph[penwidth=0, labelloc="b"];
+                        //label="Application part (Serverless)";
+                        label="";
+                        app0 [shape=box3d label="reactive app1"];
+                        app2 [shape=box3d label="reactive appN"];
+                };
+                        cloudEvent1 [image="../assets/cloud-events.svg" width=1 height=1 fixedsize=true];
+                        cloudEvent2 [image="../assets/cloud-events.svg" width=1 height=1 fixedsize=true];
+                subgraph cluster_Knative {
+                        bgcolor="#0000005f"
+                        label="Knative";
+                        knative [image="../assets/knative-logo.png" width=1 height=1 fixedsize=true];
+                        broker [label="event broker",shape=box3d];
+                        channel [label="channel",shape=cylinder];
+                        trigger0 [label="triggers",shape=note style=filled color="#ff00005f" ];
+                        cloudEvent0 [image="../assets/cloud-events.svg" width=1 height=1 fixedsize=true];
+                        broker -> cloudEvent0;
+                        cloudEvent0 -> channel;
+                        knative -> trigger0[penwidth=0];
+                };
+                k8s [image="../assets/Kubernetes_logo_without_workmark.svg" width=1 height=1 fixedsize=true];
+        };
+        broker -> cloudEvent1 -> app0;
+        broker -> cloudEvent2 -> app2;
+        cloudStorage -> broker;
+        k8s -> cloudEvent2 [penwidth=0];
+}
