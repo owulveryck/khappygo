@@ -2,15 +2,25 @@ digraph G {
         graph [fontname = "Century Gothic"];
         node [fontname = "Century Gothic"];
         edge [fontname = "Century Gothic"];
+
+        rankdir = LR;
         compound=true;
         ranksep=1.25;
+
+        node [shape=plaintext, fontsize=16, label=""];
+
+        bgcolor=white;
+        edge [arrowsize=1, color=black];
+        graph[penwidth=0, labelloc="b"];
+
         label="Storage service";
 
-        node [shape=plaintext, fontsize=16];
 
         bgcolor=white;
         edge [arrowsize=1, color=black];
         http [label="Post Request"];
         webservice [label="HTTP Web Service", shape=box];
-        cloudStorage [image="./assets/Google-Cloud-Storage-Logo.png"];
+        cloudStorage [image="./assets/Google-Cloud-Storage-Logo.svg"];
+        http -> webservice;
+        webservice -> cloudStorage;
 }

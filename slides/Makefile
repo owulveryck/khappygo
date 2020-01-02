@@ -1,8 +1,12 @@
 DOT_FILES=$(wildcard *.dot)
-DOTPNG=$(DOT_FILES:.dot=.svg)
+DOTSVG=$(DOT_FILES:.dot=.svg)
+DOTPNG=$(DOT_FILES:.dot=.png)
 
 .PHONY: all
-all: $(DOTPNG)
+all: $(DOTSVG)
 
 %.svg: %.dot
 	dot -Tsvg $< > $@
+
+%.png: %.dot
+	dot -Tpng $< > $@
