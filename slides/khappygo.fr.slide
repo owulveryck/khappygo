@@ -46,13 +46,28 @@ La version 1.0 a été publiée le 24 Octobre 2019.
 : if you want to indicate an event that is significant to your domain, raise this event explicitly and let the other classes in your domain model subscribe and react to it.
 : https://enterprisecraftsmanship.com/posts/domain-events-simple-reliable-solution/
 
-* L'infrastructure évènementielle
+* L'infrastructure d'hébergement: la partie "Ops"
 
+.html perso-ops.html
 Extrait de la doc: [[https://docs.microsoft.com/fr-fr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/domain-events-design-implementation][Domain events design implementation]]
 
 _l’interface_du_bus_d’événements_a_besoin_d’une_infrastructure_permettant_une_communication_entre_processus_et_distribuée_entre_des_services_potentiellement_distants._
 
-* knative eventing
+Nous demandons aux Ops une infrastructure d'hébergement de nos containers...
+
+.image assets/Kubernetes_logo_without_workmark.svg 60 _
+.caption Kubernetes
+
+* Oui mais...
+
+Kubernetes est un gros projet, et les devs ont suffisamment de travail sans avoir à se soucier de la gestion de k8s...
+
+Parfois, il rèvent de Serverless.
+
+.image https://images.globest.com/contrib/content/uploads/sites/305/2016/07/ch2Data_Center_Empty_0-3.jpg
+.caption Rare picture of a serverless datacenter - ([[https://www.globest.com/sites/brianjrogal/2017/10/03/chicago-data-center-market-tightens/][source www.globest.com]])
+
+* Une solution DevOps friendly?
 
 [[https://knative.dev/docs/eventing/][Knative Eventing]] est un projet de la CNCF; c'est un ensemble d'extensions posées sur un cluster kubernetes.
 
@@ -61,11 +76,12 @@ Extrait du site officiel: _Knative_Eventing_is_a_system_that_is_designed_to_addr
 .image assets/knative-logo.png 60 _
 .caption Knative
 .image assets/Kubernetes_logo_without_workmark.png 60 _
-.caption Kubernetes
 
-* Architecture technique
+* Architecture technique (aka: comment ça marche)
 
 .image knative.svg
+
+* Description des services
 
 * Les services
 
