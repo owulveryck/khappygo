@@ -7,6 +7,7 @@ all: $(DOTSVG)
 
 %.svg: %.dot
 	dot -Tsvg $< > $@
+	./base64ify $@
 
 %.png: %.dot
 	dot -Tpng $< > $@

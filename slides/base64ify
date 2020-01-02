@@ -1,0 +1,7 @@
+#!/bin/sh
+
+egrep -o "./assets/.*svg" $1 | while read svgFile
+do
+		base64File=$(cat $svgFile | base64)
+		sed -i_ "s|$svgFile|data:image/svg+xml;base64,$base64File|" $1
+done
