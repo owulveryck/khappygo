@@ -16,7 +16,9 @@ spec:
           image: gcr.io/{{PROJECT_ID}}/yolo:{{VERSION}}
           env:
           - name: MODEL
-            value: "gs://khappygo/models/model.onnx"
+            value: "gs://khappygo/models/faces.onnx"
+          - name: BROKER
+            value: "http://default-broker.event-example.svc.cluster.local"
 
 ---
 

@@ -70,9 +70,11 @@ Les évènements sont décrit dans un format indépendant nommé "cloud events".
 "cloud events" est une spécification qui permet de décrire les évènements d'une manière agnostique des applications
 et des cloud providers.
 
-La version 1.0 publiée le 24 Octobre 2019.
 
-.link https://cloudevents.io/ > https://cloudevents.io
+.image assets/cloud-events.svg 90 _
+.caption [[https://cloudevents.io/][https://cloudevents.io]]
+
+La version 1.0 a été publiée le 24 Octobre 2019.
 
 : if you want to indicate an event that is significant to your domain, raise this event explicitly and let the other classes in your domain model subscribe and react to it.
 : https://enterprisecraftsmanship.com/posts/domain-events-simple-reliable-solution/
@@ -88,9 +90,12 @@ _l’interface_du_bus_d’événements_a_besoin_d’une_infrastructure_permettan
 
 [[https://knative.dev/docs/eventing/][Knative Eventing]] est un projet de la CNCF; c'est un ensemble d'extensions posées sur un cluster kubernetes.
 
-_Knative_Eventing_is_a_system_that_is_designed_to_address_a_common_need_for_cloud_native_development_and_provides_composable_primitives_to_enable_late-binding_event_sources_and_event_consumers._
+Extrait du site officiel: _Knative_Eventing_is_a_system_that_is_designed_to_address_a_common_need_for_cloud_native_development_and_provides_composable_primitives_to_enable_late-binding_event_sources_and_event_consumers._
 
-
+.image assets/knative-logo.png 60 _
+.caption Knative
+.image assets/Kubernetes_logo_without_workmark.png 60 _
+.caption Kubernetes
 
 * "data-science"
 

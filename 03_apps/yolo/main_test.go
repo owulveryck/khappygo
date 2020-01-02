@@ -45,7 +45,7 @@ func TestReceive(t *testing.T) {
 	}))
 	defer ts.Close()
 	//b, err := ioutil.ReadFile("../../models/tinyyolov2.onnx")
-	b, err := ioutil.ReadFile("../../models/faces.onnx")
+	b, err := ioutil.ReadFile("../../02_models/faces.onnx")
 	if err != nil {
 		t.Fatal(err)
 	}

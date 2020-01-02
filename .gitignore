@@ -15,10 +15,10 @@
 # vendor/
 .envrc
 
-apps/emotion/emotion
-apps/image-extractor/image-extractor
-apps/yolo/yolo
-apps/report/report
+03_apps/emotion/emotion
+03_apps/image-extractor/image-extractor
+03_apps/yolo/yolo
+03_apps/report/report
 .DS_Store
 
 .DS_Store

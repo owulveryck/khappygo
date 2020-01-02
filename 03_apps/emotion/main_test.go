@@ -20,7 +20,7 @@ func TestReceive(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	b, err := ioutil.ReadFile("../../models/emotions.onnx")
+	b, err := ioutil.ReadFile("../../02_models/emotions.onnx")
 	if err != nil {
 		t.Fatal(err)
 	}
