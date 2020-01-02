@@ -49,7 +49,7 @@ printf "${GREEN}"
 echo "get credentials"
 printf "${NC}"
 printf "${LIGHTGREY}"
-gcloud container clusters get-credentials knative-test
+gcloud container clusters get-credentials knative-test --zone europe-west4-b
 printf "${NC}"
 
 printf "${GREEN}"

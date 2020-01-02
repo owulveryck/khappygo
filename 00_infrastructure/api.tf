@@ -10,3 +10,10 @@ resource "google_project_service" "cloudresourcemanager_api" {
   disable_dependent_services = true
 }
 
+resource "google_project_service" "cloudbbuild_api" {
+  service = "cloudbuild.googleapis.com"
+
+  disable_dependent_services = true
+}
+
+
