@@ -20,3 +20,7 @@ apps/image-extractor/image-extractor
 apps/yolo/yolo
 apps/report/report
 .DS_Store
+
+.DS_Store
+.terraform
+*.tfstate
