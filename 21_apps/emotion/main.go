@@ -163,6 +163,7 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 }
 
 func (c *carrier) getElement(ctx context.Context, imgPath string) (io.ReadCloser, error) {
+	imgPath = strings.Trim(imgPath, `"`)
 	imageURL, err := url.Parse(imgPath)
 	if err != nil {
 		return nil, err

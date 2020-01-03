@@ -1,2 +1,2 @@
-VERSION=v0.5
+VERSION=v0.5.2
 

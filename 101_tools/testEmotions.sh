@@ -1,12 +1,11 @@
 
-gsutil cp ../21_apps/testdata/meme.jpg gs://khappygo
 kubectl --namespace event-example exec curl -- curl -v "http://default-broker.event-example.svc.cluster.local" \
   -X POST \
-  -H "Ce-Id: test" \
+  -H "Ce-Id: testEmotion" \
   -H "Ce-Specversion: 0.3" \
-  -H "Ce-Type: image.png" \
-  -H "Ce-Source: not-sendoff" \
+  -H "Ce-Type: image.partial.png" \
+  -H "Ce-Source: test" \
   -H "Content-Type: text/plain" \
-  -d 'gs://khappygo/meme.jpg'
+  -d 'gs://khappygo/processed/meme_0_face.jpg'
 
-kubectl --namespace event-example  logs --selector app=yolo
+kubectl --namespace event-example  logs --selector app=emotion

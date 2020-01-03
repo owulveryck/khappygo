@@ -19,6 +19,10 @@ spec:
             value: "gs://khappygo/models/faces.onnx"
           - name: BROKER
             value: "http://default-broker.event-example.svc.cluster.local"
+          - name: CONFIDENCE_THRESHOLD
+            value: "0.01"
+          - name: PROBA_THRESHOLD
+            value: "0.50"
 
 ---
 
