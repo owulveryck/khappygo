@@ -45,7 +45,7 @@ func TestReceive(t *testing.T) {
 	}))
 	defer ts.Close()
 	//b, err := ioutil.ReadFile("../../models/tinyyolov2.onnx")
-	b, err := ioutil.ReadFile("../../02_models/faces.onnx")
+	b, err := ioutil.ReadFile("../../20_models/faces.onnx")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,6 +71,7 @@ func TestReceive(t *testing.T) {
 	newEvent.SetSource("test")
 	newEvent.SetType("image.png")
 	newEvent.SetID(uuid.New().String())
+	newEvent.SetDataContentType("text/plain")
 	//newEvent.SetData("file://../testdata/meme.jpg")
 	newEvent.SetData("file://../testdata/100k-ai-faces-1.jpg")
 	var response cloudevents.EventResponse

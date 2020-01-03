@@ -20,7 +20,7 @@ func TestReceive(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	b, err := ioutil.ReadFile("../../02_models/emotions.onnx")
+	b, err := ioutil.ReadFile("../../20_models/emotions.onnx")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,7 +44,8 @@ func TestReceive(t *testing.T) {
 	newEvent.SetSource("image-extractor")
 	newEvent.SetType("image.partial.png")
 	newEvent.SetID(uuid.New().String())
-	newEvent.SetData("file://../testdata/meme_0_face.jpg")
+	//newEvent.SetData("file://../testdata/meme_0_face.jpg")
+	newEvent.SetData("gs://../testdata/meme_0_face.jpg")
 	var response cloudevents.EventResponse
 	err = c.receive(context.TODO(), newEvent, &response)
 	if err != nil {

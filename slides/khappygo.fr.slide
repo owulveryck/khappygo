@@ -26,7 +26,7 @@ A la différence des autres produits, ce service ne demande *pas* *d'interractio
 Nous considérons que l'application a été conçue en utilisant les principes [[https://www.oreilly.com/library/view/reactive-microsystems/9781491994368/ch04.html][_Events-First_Domain-Driven_Design_.]]
 
 _When_you_start_modeling_events,_it_forces_you_to_think_about_the_behavior_of_the_system,_as_opposed_to_thinking_about_structure_inside_the_system._
-_Modeling_events_forces_you_to_have_a_temporal_focus_on_what’s_going_on_in_the_system._Time_becomes_a_crucial_factor_of_the_system._
+_Modeling_events_forces_you_to_have_a_temporal_focus_on_what’s_going_on_in_the_system._
 
 ([[https://twitter.com/gregyoung][Greg Young]])
 
@@ -34,8 +34,7 @@ _Modeling_events_forces_you_to_have_a_temporal_focus_on_what’s_going_on_in_the
 
 Les évènements sont décrit dans un format indépendant nommé "cloud events".
 
-"cloud events" est une spécification qui permet de décrire les évènements d'une manière agnostique des applications
-et des cloud providers.
+"cloud events" est une spécification qui permet de décrire les évènements d'une manière agnostique des applications et des cloud providers.
 
 
 .image assets/cloud-events.svg 90 _
@@ -48,14 +47,13 @@ La version 1.0 a été publiée le 24 Octobre 2019.
 
 * L'infrastructure d'hébergement: la partie "Ops"
 
-.html perso-ops.html
 Extrait de la doc: [[https://docs.microsoft.com/fr-fr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/domain-events-design-implementation][Domain events design implementation]]
 
 _l’interface_du_bus_d’événements_a_besoin_d’une_infrastructure_permettant_une_communication_entre_processus_et_distribuée_entre_des_services_potentiellement_distants._
 
-Nous demandons aux Ops une infrastructure d'hébergement de nos containers...
+Nous demandons aux Ops une infrastructure d'hébergement de nos containers... Et forcément, ils proposent:
 
-.image assets/Kubernetes_logo_without_workmark.svg 60 _
+.image assets/Kubernetes_logo_without_workmark.svg 80 _
 .caption Kubernetes
 
 * Oui mais...
@@ -64,18 +62,18 @@ Kubernetes est un gros projet, et les devs ont suffisamment de travail sans avoi
 
 Parfois, il rèvent de Serverless.
 
-.image https://images.globest.com/contrib/content/uploads/sites/305/2016/07/ch2Data_Center_Empty_0-3.jpg
+.image https://images.globest.com/contrib/content/uploads/sites/305/2016/07/ch2Data_Center_Empty_0-3.jpg 300 _
 .caption Rare picture of a serverless datacenter - ([[https://www.globest.com/sites/brianjrogal/2017/10/03/chicago-data-center-market-tightens/][source www.globest.com]])
 
 * Une solution DevOps friendly?
+
+.image assets/knative-logo.png 80 _
+.caption Knative
 
 [[https://knative.dev/docs/eventing/][Knative Eventing]] est un projet de la CNCF; c'est un ensemble d'extensions posées sur un cluster kubernetes.
 
 Extrait du site officiel: _Knative_Eventing_is_a_system_that_is_designed_to_address_a_common_need_for_cloud_native_development_and_provides_composable_primitives_to_enable_late-binding_event_sources_and_event_consumers._
 
-.image assets/knative-logo.png 60 _
-.caption Knative
-.image assets/Kubernetes_logo_without_workmark.png 60 _
 
 * Architecture technique (aka: comment ça marche)
 
@@ -125,14 +123,23 @@ Les images sont récupérées par un service web "REST" qui les dépose dans le 
 
 - génère des enregistrements dans une base de donnée
 
-* "data-science"
+* Détail des services AI-Powered
 
-* Trouver les visages
+* Le modèle pour detecter les visages
 
 Nous utilisons le modèle _YOLO_.
 YOLO est un réseau de neurones qui permet la détection multi-objets.
 
+Ce réseau n'est pas spécifique qux visages, il est capable de reconnaire plusieurs classes d'objets en une seule passe.
+
+Ce réseau à l'avantage d'être particulière rapide à l'execution.
+
 .link https://pjreddie.com/darknet/yolo/
+
+* tests
+
+.link https://console.cloud.google.com/storage/browser/khappygo?hl=fr&project=khappygo
+
 * logos
 
 .image assets/Kubernetes_logo_without_workmark.png 60 _

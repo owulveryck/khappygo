@@ -83,7 +83,7 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		return err
 	}
 	cropped := imaging.Crop(img, image.Rect(b.X0, b.Y0, b.X1, b.Y1))
-	imgPath := filepath.Join(config.Dest, name+"_"+strconv.Itoa(b.ID)+"_"+b.Element+extension)
+	imgPath := config.Dest + "/" + name + "_" + strconv.Itoa(b.ID) + "_" + b.Element + extension
 	w, err := c.postElement(ctx, imgPath)
 	if err != nil {
 		log.Println(err)

@@ -175,7 +175,8 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		element := output[i].Element
 		//		for _, element := range output[i].Elements {
 		newEvent := cloudevents.NewEvent("1.0")
-		newEvent.Context = event.Context.Clone()
+		log.Println(event.Context)
+		//newEvent.Context = event.Context.Clone()
 		newEvent.SetType("boundingbox")
 		newEvent.SetID(uuid.New().String())
 		newEvent.SetSource("yolo")

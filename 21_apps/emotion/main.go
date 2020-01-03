@@ -101,6 +101,7 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		response.Error(http.StatusBadRequest, "expected data to be a string")
 		return errors.New("expected data to be a string")
 	}
+	log.Println(imgPath)
 	rc, err := c.getElement(ctx, imgPath)
 	if err != nil {
 		log.Println(err)

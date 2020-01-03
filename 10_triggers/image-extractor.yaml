@@ -1,14 +1,14 @@
 apiVersion: eventing.knative.dev/v1alpha1
 kind: Trigger
 metadata:
-  name: report
+  name: image-extractor
 spec:
   broker: default
   filter:
     attributes:
-      type: emotion
+      type: boundingbox
   subscriber:
     ref:
-      apiVersion: serving.knative.dev/v1
+      apiVersion: v1
       kind: Service
-      name: report-service
+      name: image-extractor-service
