@@ -6,7 +6,6 @@ import (
 	"image"
 	"image/jpeg"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -19,8 +18,6 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/owulveryck/khappygo/apps/common/emotions"
 	"github.com/owulveryck/khappygo/apps/common/kclient"
-	"github.com/owulveryck/onnx-go"
-	"github.com/owulveryck/onnx-go/backend/x/gorgonnx"
 	"gorgonia.org/tensor"
 )
 
@@ -29,7 +26,8 @@ type configuration struct {
 }
 
 var (
-	config configuration
+	config        configuration
+	storageClient *storage.Client
 )
 
 func main() {
@@ -48,17 +46,11 @@ func main() {
 	object := strings.Trim(modelURL.Path, "/")
 
 	ctx := context.Background()
-	client, err := storage.NewClient(ctx)
+	storageClient, err = storage.NewClient(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
-	rc, err := client.Bucket(bucket).Object(object).NewReader(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Reading model")
-	b, err := ioutil.ReadAll(rc)
-	rc.Close()
+	rc, err := storageClient.Bucket(bucket).Object(object).NewReader(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,21 +58,26 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
 	}
-	c := &carrier{
-		storageClient: client,
-		onnx:          b,
+	machine := NewModelMachine()
+	err = machine.Start(rc)
+	if err != nil {
+		log.Fatal(err)
 	}
+	rc.Close()
+
+	ep := &EventProcessor{
+		Machine: machine,
+	}
+
 	log.Println("emotion is listening for events")
-	log.Fatal(kreceiver.StartReceiver(context.Background(), c.receive))
+	log.Fatal(kreceiver.StartReceiver(context.Background(), ep.Receive))
 }
 
-type carrier struct {
-	cloudeventsClient cloudevents.Client
-	onnx              []byte
-	storageClient     *storage.Client
+type EventProcessor struct {
+	Machine *ModelMachine
 }
 
-func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
+func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
 	var imgPath string
 	err := event.DataAs(&imgPath)
 	if err != nil {
@@ -89,7 +86,7 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		return errors.New("expected data to be a string")
 	}
 	log.Println(imgPath)
-	rc, err := c.getElement(ctx, imgPath)
+	rc, err := getElement(ctx, imgPath)
 	if err != nil {
 		log.Println(err)
 		response.Error(http.StatusBadRequest, err.Error())
@@ -118,30 +115,18 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		response.Error(http.StatusInternalServerError, err.Error())
 		return err
 	}
-	log.Println(inputT)
 
-	// Create a backend receiver
-	backend := gorgonnx.NewGraph()
-	// Create a model and set the execution backend
-	model := onnx.NewModel(backend)
-	// Decode it into the model
-	log.Println("Unmarshaling model")
-	err = model.UnmarshalBinary(c.onnx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	model.SetInput(0, inputT)
-	err = backend.Run()
-	if err != nil {
-		log.Println(err)
-		response.Error(http.StatusInternalServerError, err.Error())
-		return err
-	}
-	outputs, err := model.GetOutputTensors()
-	if err != nil {
-		log.Println(err)
-		response.Error(http.StatusInternalServerError, err.Error())
-		return err
+	job := NewJob(inputT)
+
+	var outputs []tensor.Tensor
+	for {
+		select {
+		case err := <-job.ErrC:
+			log.Println(err)
+			response.Error(http.StatusInternalServerError, err.Error())
+			return err
+		case outputs = <-job.Output:
+		}
 	}
 	emotionT := outputs[0].Data().([]float32)
 	emotions := emotions.Emotion{
@@ -161,7 +146,7 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 	return nil
 }
 
-func (c *carrier) getElement(ctx context.Context, imgPath string) (io.ReadCloser, error) {
+func getElement(ctx context.Context, imgPath string) (io.ReadCloser, error) {
 	imgPath = strings.Trim(imgPath, `"`)
 	imageURL, err := url.Parse(imgPath)
 	if err != nil {
@@ -171,7 +156,7 @@ func (c *carrier) getElement(ctx context.Context, imgPath string) (io.ReadCloser
 	case "gs":
 		bucket := imageURL.Host
 		object := strings.Trim(imageURL.Path, "/")
-		return c.storageClient.Bucket(bucket).Object(object).NewReader(ctx)
+		return storageClient.Bucket(bucket).Object(object).NewReader(ctx)
 	case "file":
 		return os.Open(imageURL.Host + imageURL.Path)
 	}
