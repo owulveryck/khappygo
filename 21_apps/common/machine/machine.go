@@ -1,4 +1,4 @@
-package main
+package machine
 
 import (
 	"io"
@@ -54,6 +54,7 @@ func (c *ModelMachine) Start(r io.Reader) error {
 	}
 	go func() {
 		for job := range c.Feed {
+			log.Println("job")
 			model.SetInput(0, job.InputT)
 			err = backend.Run()
 			if err != nil {
@@ -65,6 +66,7 @@ func (c *ModelMachine) Start(r io.Reader) error {
 				job.ErrC <- err
 				continue
 			}
+			log.Println("Sending output")
 			job.Output <- outputs
 		}
 	}()

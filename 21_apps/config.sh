@@ -1,2 +1,2 @@
-VERSION=v0.6.0
+VERSION=v0.7.0
 

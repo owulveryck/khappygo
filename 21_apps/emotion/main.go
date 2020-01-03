@@ -18,6 +18,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"github.com/owulveryck/khappygo/apps/common/emotions"
 	"github.com/owulveryck/khappygo/apps/common/kclient"
+	"github.com/owulveryck/khappygo/apps/common/machine"
 	"gorgonia.org/tensor"
 )
 
@@ -58,7 +59,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
 	}
-	machine := NewModelMachine()
+	machine := machine.NewModelMachine()
 	err = machine.Start(rc)
 	if err != nil {
 		log.Fatal(err)
@@ -74,7 +75,7 @@ func main() {
 }
 
 type EventProcessor struct {
-	Machine *ModelMachine
+	Machine *machine.ModelMachine
 }
 
 func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
@@ -119,14 +120,12 @@ func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, r
 	job := NewJob(inputT)
 
 	var outputs []tensor.Tensor
-	for {
-		select {
-		case err := <-job.ErrC:
-			log.Println(err)
-			response.Error(http.StatusInternalServerError, err.Error())
-			return err
-		case outputs = <-job.Output:
-		}
+	select {
+	case err := <-job.ErrC:
+		log.Println(err)
+		response.Error(http.StatusInternalServerError, err.Error())
+		return err
+	case outputs = <-job.Output:
 	}
 	emotionT := outputs[0].Data().([]float32)
 	emotions := emotions.Emotion{
