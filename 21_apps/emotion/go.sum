@@ -127,6 +127,8 @@ github.com/owulveryck/khappygo v0.0.0-20200103150714-a28db215fc76 h1:tJnquBZIvRO
 github.com/owulveryck/khappygo v0.0.0-20200103150714-a28db215fc76/go.mod h1:YLS4667ftypdFaPnaCCUS/YX5oZmeBgysqLN8zQsrgI=
 github.com/owulveryck/khappygo v0.0.0-20200103151519-69bd2df5ef09 h1:4X2tQ1qa+DM9m81AMa+VmuZMavjjE8lfsXqRrLz78AM=
 github.com/owulveryck/khappygo v0.0.0-20200103151519-69bd2df5ef09/go.mod h1:P9a1/oTMx2j/CdQiQjnWbekKLyd6kV2q0QGnMAzYCvE=
+github.com/owulveryck/khappygo v0.0.0-20200103151831-72423ab4c146 h1:Cp6hSxOUCInAhvGk3p0CIOJQXFuZiuWkacWFebEAUdA=
+github.com/owulveryck/khappygo v0.0.0-20200103151831-72423ab4c146/go.mod h1:P9a1/oTMx2j/CdQiQjnWbekKLyd6kV2q0QGnMAzYCvE=
 github.com/owulveryck/onnx-go v0.5.0/go.mod h1:J+buXYZXhLtuMBfBYzM1O2u0tfFjpDExpQe9NhCkyPI=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
