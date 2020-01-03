@@ -20,7 +20,6 @@ import (
 	"github.com/owulveryck/khappygo/apps/common/emotions"
 	"github.com/owulveryck/khappygo/apps/common/kclient"
 	"github.com/owulveryck/onnx-go"
-	"github.com/owulveryck/onnx-go/backend"
 	"github.com/owulveryck/onnx-go/backend/x/gorgonnx"
 	"gorgonia.org/tensor"
 )
@@ -63,24 +62,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Create a backend receiver
-	backend := gorgonnx.NewGraph()
-	// Create a model and set the execution backend
-	m := onnx.NewModel(backend)
-	// Decode it into the model
-	log.Println("Unmarshaling model")
-	err = m.UnmarshalBinary(b)
-	if err != nil {
-		log.Fatal(err)
-	}
 	kreceiver, err := kclient.NewDefaultClient()
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
 	}
 	c := &carrier{
 		storageClient: client,
-		model:         m,
-		backend:       backend,
+		onnx:          b,
 	}
 	log.Println("emotion is listening for events")
 	log.Fatal(kreceiver.StartReceiver(context.Background(), c.receive))
@@ -88,9 +76,8 @@ func main() {
 
 type carrier struct {
 	cloudeventsClient cloudevents.Client
+	onnx              []byte
 	storageClient     *storage.Client
-	model             *onnx.Model
-	backend           backend.ComputationBackend
 }
 
 func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
@@ -109,6 +96,7 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		return err
 	}
 	defer rc.Close()
+
 	jpg, _ := jpeg.Decode(rc)
 
 	height := 64
@@ -130,15 +118,26 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		response.Error(http.StatusInternalServerError, err.Error())
 		return err
 	}
+	log.Println(inputT)
 
-	c.model.SetInput(0, inputT)
-	err = c.backend.Run()
+	// Create a backend receiver
+	backend := gorgonnx.NewGraph()
+	// Create a model and set the execution backend
+	model := onnx.NewModel(backend)
+	// Decode it into the model
+	log.Println("Unmarshaling model")
+	err = model.UnmarshalBinary(c.onnx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	model.SetInput(0, inputT)
+	err = backend.Run()
 	if err != nil {
 		log.Println(err)
 		response.Error(http.StatusInternalServerError, err.Error())
 		return err
 	}
-	outputs, err := c.model.GetOutputTensors()
+	outputs, err := model.GetOutputTensors()
 	if err != nil {
 		log.Println(err)
 		response.Error(http.StatusInternalServerError, err.Error())

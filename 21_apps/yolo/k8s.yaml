@@ -20,9 +20,9 @@ spec:
           - name: BROKER
             value: "http://default-broker.event-example.svc.cluster.local"
           - name: CONFIDENCE_THRESHOLD
-            value: "0.01"
+            value: "0.1"
           - name: PROBA_THRESHOLD
-            value: "0.50"
+            value: "0.90"
 
 ---
 
