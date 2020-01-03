@@ -7,6 +7,8 @@ require (
 	cloud.google.com/go/storage v1.4.0
 	github.com/cloudevents/sdk-go v0.10.2
 	github.com/disintegration/imaging v1.6.2
+	github.com/esimov/pigo v1.4.0
+	github.com/fogleman/gg v1.2.1-0.20190220221249-0403632d5b90
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7 // indirect
 	github.com/google/uuid v1.1.1

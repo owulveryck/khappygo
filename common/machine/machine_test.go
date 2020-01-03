@@ -2,27 +2,37 @@ package machine
 
 import (
 	"bytes"
-	"log"
+	"io"
 	"testing"
 
 	onnxtest "github.com/owulveryck/onnx-go/backend/testbackend/onnx"
+	"gorgonia.org/tensor"
 )
 
 func TestModelMachine_Start(t *testing.T) {
+	// START_TEST OMIT
 	machine := NewModelMachine()
-	test := onnxtest.NewTestSqrt()
-	err := machine.Start(bytes.NewBuffer(test.ModelB))
-	if err != nil {
-		t.Fatal(err)
-	}
-	job := NewJob(test.Input[0])
+	var onnxModelReader io.Reader
+	// Reading onnxModelReader ... (ex: os.Open("path/to/model.onnx"))
+	test := onnxtest.NewTestSqrt()                 // OMIT
+	onnxModelReader = bytes.NewBuffer(test.ModelB) // OMIT
+	err := machine.Start(onnxModelReader)
+	if err != nil { //OMIT
+		t.Fatal(err) //OMIT
+	} //OMIT
+	var inputTensor tensor.Tensor
+	// Setting value... (ex: inputTensor = ImageToTensor("image.jpg"))
+	inputTensor = test.Input[0] // OMIT
+	job := NewJob(inputTensor)
 	machine.Feed <- job
 	select {
 	case err := <-job.ErrC:
-		t.Fatal(err)
+		// Error handling
+		t.Fatal(err) // OMIT
 	case outputs := <-job.Output:
-		log.Println("received")
-		t.Log(outputs[0])
-		//ExpectedOutput
+		// outputs is an array of tensors
+		// process the output
+		t.Log(outputs[0]) // OMIT
 	}
+	// END_TEST OMIT
 }

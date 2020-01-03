@@ -125,6 +125,36 @@ Les images sont récupérées par un service web "REST" qui les dépose dans le 
 
 * Détail des services AI-Powered
 
+* Principe de fonctionnement général
+
+* ONNX pour une séparation des logiciels 1.0 et 2.0
+
+TODO: expliquer ONNX
+.image assets/ONNX_logo_main.png 60 _
+.caption ONNX
+
+* Go
+
+Nous allons coder les applications en utilisant le langage Go.
+La partie "IA" se fera simplement par execution du code "ONNX".
+
+Le reste de l'application se contente de
+
+- traiter les évènements d'entrée
+- de créer les tenseurs
+- d'appliquer le modèle
+- et de générer des réponses ou de nouveaux évènements.
+
+.image assets/gorgonia.svg 60 _
+.caption Gorgonia
+
+* Code
+
+Le principe de traitement est grandement simplifié grâce à l'uilisation d'onnx.
+.code ../common/machine/machine_test.go /START/,/END/
+
+* Les modèles
+
 * Le modèle pour detecter les visages
 
 Nous utilisons le modèle _YOLO_.
@@ -135,6 +165,13 @@ Ce réseau n'est pas spécifique qux visages, il est capable de reconnaire plusi
 Ce réseau à l'avantage d'être particulière rapide à l'execution.
 
 .link https://pjreddie.com/darknet/yolo/
+
+* Le modèle de détection de sentiments
+
+Fer+ est un réseau de convolution profond (DCNN) qui permet de déterminer les sentiments à partir d'une image.
+
+.image https://raw.githubusercontent.com/Microsoft/FERPlus/master/FER+vsFER.png
+.link https://github.com/microsoft/FERPlus
 
 * tests
 

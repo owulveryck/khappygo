@@ -4,7 +4,7 @@
 
 DIR=$(pwd)
 
-ls -d */ | while read dir
+ls -d */  | while read dir
 do
 	  dir=$(echo $dir | sed 's|/||')
 		cd $DIR/$dir

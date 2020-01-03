@@ -120,6 +120,9 @@ func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, r
 	}
 
 	job := machine.NewJob(inputT)
+	defer close(job.Output)
+	defer close(job.ErrC)
+	e.Machine.Feed <- job
 
 	var outputs []tensor.Tensor
 	select {
