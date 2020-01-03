@@ -19,8 +19,8 @@ import (
 	"github.com/disintegration/imaging"
 	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/owulveryck/khappygo/apps/common/box"
-	"github.com/owulveryck/khappygo/apps/common/kclient"
+	"github.com/owulveryck/khappygo/common/box"
+	"github.com/owulveryck/khappygo/common/kclient"
 )
 
 type configuration struct {

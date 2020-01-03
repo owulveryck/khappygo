@@ -9,7 +9,7 @@ import (
 	"cloud.google.com/go/storage"
 	cloudevents "github.com/cloudevents/sdk-go"
 	"github.com/google/uuid"
-	"github.com/owulveryck/khappygo/apps/common/box"
+	"github.com/owulveryck/khappygo/common/box"
 )
 
 func TestReceive(t *testing.T) {

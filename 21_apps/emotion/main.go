@@ -16,9 +16,9 @@ import (
 	cloudevents "github.com/cloudevents/sdk-go"
 	"github.com/disintegration/imaging"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/owulveryck/khappygo/apps/common/emotions"
-	"github.com/owulveryck/khappygo/apps/common/kclient"
-	"github.com/owulveryck/khappygo/apps/common/machine"
+	"github.com/owulveryck/khappygo/common/emotions"
+	"github.com/owulveryck/khappygo/common/kclient"
+	"github.com/owulveryck/khappygo/common/machine"
 	"gorgonia.org/tensor"
 )
 
@@ -74,10 +74,12 @@ func main() {
 	log.Fatal(kreceiver.StartReceiver(context.Background(), ep.Receive))
 }
 
+// EventProcessor ...
 type EventProcessor struct {
 	Machine *machine.ModelMachine
 }
 
+// Receive ...
 func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
 	var imgPath string
 	err := event.DataAs(&imgPath)
@@ -117,7 +119,7 @@ func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, r
 		return err
 	}
 
-	job := NewJob(inputT)
+	job := machine.NewJob(inputT)
 
 	var outputs []tensor.Tensor
 	select {
