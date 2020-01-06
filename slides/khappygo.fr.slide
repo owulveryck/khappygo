@@ -9,6 +9,10 @@ https://github.com/owulveryck/khappygo
 
 * Agenda
 
+- Programmation d'application IA avec onnx et Go
+- Design d'application d'IA avec Knative
+- Ingénierie logicielle d'une application d'IA
+
 * La société "RUH" (Are You Happy?)
 
 Afin de satisfaire le besoin des *retailers* *physiques* d'amélioration de l'expérience utilisateur,
@@ -18,6 +22,85 @@ la société RUH propose un service de *colecte* et d'*analyse* *de* *sentiments
 A la différence des autres produits, ce service ne demande *pas* *d'interractions* avec les clients.
 
 .image assets/sad-4730689_640.png _ 300
+
+* > Une application simple qui detecte les sentiments.
+
+* le réseau de neurones, et l'application
+
+- La business logique est gérée par un réseau de neurones;
+- L'application se charge des entrées/sorties du réseau de neurones;
+- L'application utilise une couche d'execution pour appliquer les calculs;
+
+.image assets/archiSimple1.png
+.caption Source: [[blog.owulveryck.info][blog.owulveryck.info]]
+
+* exemple de parralèle avec le monde Python
+
+- La business logique est codée avec *Kheras*;
+- L'application en *Python* se charge des entrées/sorties;
+- *Tensorflow* applique les calculs;
+
+.image assets/archiSimple1.png
+.caption Source: [[blog.owulveryck.info][blog.owulveryck.info]]
+
+* Dans notre cas:
+
+- La business logique est codée avec *Kheras* et exportée en *ONNX*;
+- L'application en *Go* se charge des entrées/sorties;
+- *Gorgonia* applique les calculs;
+
+.image assets/archiSimple1.png
+.caption Source: [[blog.owulveryck.info][blog.owulveryck.info]]
+
+* ONNX
+
+* Neural networks: rappels
+
+Un exemple classique de couche dans un réseau de neurones est:
+
+$$f(X) = \sigma(W \cdot X+b)$$
+
+* Equations are graphs
+
+Transformons l'équation suivante...
+$$f(X) = \sigma(W \cdot X+b)$$
+
+en une représentation fonctionnelle
+$$f(X) = \sigma(add(mul(W,X),B))$$
+
+* Les equations sont des graphes
+
+Nous pouvons alors facilement représenter cette équation en tant que graphe:
+
+.image assets/graph1.png
+
+* Conclusion rapide:
+
+Un réseau de Neurones est un Graphe dont les feuilles sont des tenseurs et des opérations.
+
+ONNX est une représentation d'un graphe de calcul exprimé en _protocol_buffers_.
+
+ONNX permet d'encoder un réseau de neurones *et*de*rester*indépendant*des*outils* (Tensorflow, Keras, PyTorch, tvm...).
+
+.image assets/ONNX_logo_main.png 60 _
+.caption ONNX
+
+* Collection de modèles pré-entrainés: le Model Zoo
+
+The ONNX Model Zoo is a collection of pre-trained models for state-of-the-art models in deep learning.
+There are available in the ONNX format.
+
+.link https://github.com/onnx/models
+
+* Le modèle de détection de sentiments
+
+_Fer+_ est un réseau de convolution profond (DCNN) qui permet de déterminer les sentiments à partir d'une image.
+
+_Fer+_ est présent dans le model Zoo
+
+.image https://raw.githubusercontent.com/Microsoft/FERPlus/master/FER+vsFER.png
+.link https://github.com/microsoft/FERPlus
+
 
 * Application design
 
@@ -131,60 +214,6 @@ Nous allons utiliser le système d'échange ONNX pour utiliser des réseaux de n
 
 * ONNX pour une séparation des logiciels 1.0 et 2.0
 
-* Neural networks: rappels
-
-Un exemple classique de couche dans un réseau de neurones est:
-
-$$f(X) = \sigma(W \cdot X+b)$$
-
-* Equations are graphs
-
-Transformons l'équation suivante...
-$$f(X) = \sigma(W \cdot X+b)$$
-
-en une représentation fonctionnelle
-$$f(X) = \sigma(add(mul(W,X),B))$$
-
-* Les equations sont des graphes
-
-Nous pouvons alors facilement représenter cette équation en tant que graphe:
-
-.image assets/graph1.png
-
-* ONNX
-
-* Brievement
-
-C'est une représentation d'un graphe de calcul exprimé en _protocol_buffers_.
-
-Exprimer un réseau de neurones en ONNX permet de réster indépendant des outils (Tensorflow, Keras, PyTorch, tvm...).
-
-.image assets/ONNX_logo_main.png 60 _
-.caption ONNX
-
-So ONNX have _DSL_ that describes a neural network in term of a computation graph.
-It also describes the mathematical operators and their expected behavior.
-
-* Écrire un logiciel pour exploiter un réseau de neurones au format ONNX
-
-Un logiciel souhaitant exploiter un réseau de neurones encodé en ONNX doit:
-
-- être capable de décoder le binaire et se représenter un graphe
-- être capable d'executer le graphe
-
-ONNX-Go fournis la capacité de comprendre le réseau de neurones.
-Il sert également de pont avec le système de calcul Gorgonia pour executer le réseau de neurones.
-
-.image assets/gorgonia.svg 60 _
-.caption Gorgonia
-
-* Collection de modèles pré-entrainés: le Model Zoo
-
-The ONNX Model Zoo is a collection of pre-trained models for state-of-the-art models in deep learning.
-There are available in the ONNX format.
-
-.link https://github.com/onnx/models
-
 * Les applications
 * Langage utilisé: Go
 
@@ -214,13 +243,6 @@ Ce réseau n'est pas spécifique qux visages, il est capable de reconnaire plusi
 Ce réseau à l'avantage d'être particulière rapide à l'execution.
 
 .link https://pjreddie.com/darknet/yolo/
-
-* Le modèle de détection de sentiments
-
-Fer+ est un réseau de convolution profond (DCNN) qui permet de déterminer les sentiments à partir d'une image.
-
-.image https://raw.githubusercontent.com/Microsoft/FERPlus/master/FER+vsFER.png
-.link https://github.com/microsoft/FERPlus
 
 * tests
 
@@ -256,3 +278,8 @@ l’interface du bus d’événements a besoin d’une infrastructure permettant
 Elle peut reposer sur un bus de services commercial, sur des files d’attente,
 sur une base de données partagée utilisée comme une boîte aux lettres,
 ou sur tout autre système de messagerie distribué et idéalement basé sur les opérations d’envoi (push).
+
+* Pour aller plus loin
+
+GNU/LINUX Magazine hs 106 - Initiez-vous au machine learning en pratique avec tensorflow et keras
+.image https://boutique.ed-diamond.com/12781-thickbox_default/gnulinux-magazine-hs-106.jpg 250 _
