@@ -15,8 +15,14 @@ spec:
         - name: pigo
           image: gcr.io/{{PROJECT_ID}}/pigo:{{VERSION}}
           env:
+          - name: BROKER
+            value: "http://default-broker.event-example.svc.cluster.local"
           - name: CASCADE_FILE
             value: "gs://khappygo/models/facefinder"
+          - name: ANGLE
+            value: "0.8"
+          - name: IOUTHRESHOLD
+            value: "0.01"
 
 ---
 

@@ -127,26 +127,75 @@ Les images sont récupérées par un service web "REST" qui les dépose dans le 
 
 * Principe de fonctionnement général
 
+Nous allons utiliser le système d'échange ONNX pour utiliser des réseaux de neurones pré-entrainés dans nos applications.
+
 * ONNX pour une séparation des logiciels 1.0 et 2.0
 
-TODO: expliquer ONNX
+* Neural networks: rappels
+
+Un exemple classique de couche dans un réseau de neurones est:
+
+$$f(X) = \sigma(W \cdot X+b)$$
+
+* Equations are graphs
+
+Transformons l'équation suivante...
+$$f(X) = \sigma(W \cdot X+b)$$
+
+en une représentation fonctionnelle
+$$f(X) = \sigma(add(mul(W,X),B))$$
+
+* Les equations sont des graphes
+
+Nous pouvons alors facilement représenter cette équation en tant que graphe:
+
+.image assets/graph1.png
+
+* ONNX
+
+* Brievement
+
+C'est une représentation d'un graphe de calcul exprimé en _protocol_buffers_.
+
+Exprimer un réseau de neurones en ONNX permet de réster indépendant des outils (Tensorflow, Keras, PyTorch, tvm...).
+
 .image assets/ONNX_logo_main.png 60 _
 .caption ONNX
 
-* Go
+So ONNX have _DSL_ that describes a neural network in term of a computation graph.
+It also describes the mathematical operators and their expected behavior.
+
+* Écrire un logiciel pour exploiter un réseau de neurones au format ONNX
+
+Un logiciel souhaitant exploiter un réseau de neurones encodé en ONNX doit:
+
+- être capable de décoder le binaire et se représenter un graphe
+- être capable d'executer le graphe
+
+ONNX-Go fournis la capacité de comprendre le réseau de neurones.
+Il sert également de pont avec le système de calcul Gorgonia pour executer le réseau de neurones.
+
+.image assets/gorgonia.svg 60 _
+.caption Gorgonia
+
+* Collection de modèles pré-entrainés: le Model Zoo
+
+The ONNX Model Zoo is a collection of pre-trained models for state-of-the-art models in deep learning.
+There are available in the ONNX format.
+
+.link https://github.com/onnx/models
+
+* Les applications
+* Langage utilisé: Go
 
 Nous allons coder les applications en utilisant le langage Go.
-La partie "IA" se fera simplement par execution du code "ONNX".
 
-Le reste de l'application se contente de
+Comme la "l'intelligence" est portée par les réseaux de neurones (via ONNX), nos applications se contententde:
 
 - traiter les évènements d'entrée
 - de créer les tenseurs
 - d'appliquer le modèle
 - et de générer des réponses ou de nouveaux évènements.
-
-.image assets/gorgonia.svg 60 _
-.caption Gorgonia
 
 * Code
 
@@ -177,6 +226,13 @@ Fer+ est un réseau de convolution profond (DCNN) qui permet de déterminer les 
 
 .link https://console.cloud.google.com/storage/browser/khappygo?hl=fr&project=khappygo
 
+* Vous n'avez pas besoin de deep-learning
+
+_Object_Detection_with_Pixel_Intensity_Comparisons_Organized_in_Decision_Trees_
+
+=> pigo
+
+.link https://arxiv.org/pdf/1305.4537.pdf
 * logos
 
 .image assets/Kubernetes_logo_without_workmark.png 60 _

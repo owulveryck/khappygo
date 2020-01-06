@@ -1,7 +1,7 @@
 apiVersion: eventing.knative.dev/v1alpha1
 kind: Trigger
 metadata:
-  name: yolo
+  name: face-detection
 spec:
   broker: default
   filter:

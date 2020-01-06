@@ -15,24 +15,28 @@ import (
 	"cloud.google.com/go/storage"
 	cloudevents "github.com/cloudevents/sdk-go"
 	pigo "github.com/esimov/pigo/core"
+	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/owulveryck/khappygo/common/box"
 	"github.com/owulveryck/khappygo/common/kclient"
 )
 
 type configuration struct {
-	Angle        float64 `default:"0.0"`
+	Angle        float64 `default:"0.8"`
 	MinSize      int     `default:"20"`
 	MaxSize      int     `default:"1000"`
 	ShiftFactor  float64 `default:"0.1"`
 	ScaleFactor  float64 `default:"1.1"`
-	IOUThreshold float64 `default:"0.2"`
+	IOUThreshold float64 `default:"0.01"`
 	CascadeFile  string  `envconfig:"cascade_file" required:"true"`
+	Broker       string  `envconfig:"broker" required:"true"`
 }
 
 var (
 	config        configuration
 	storageClient *storage.Client
 	fd            *faceDetector
+	eventsClient  cloudevents.Client
 )
 
 func main() {
@@ -65,6 +69,11 @@ func main() {
 		log.Fatal(err)
 	}
 	rc.Close()
+
+	eventsClient, err = kclient.NewDefaultClient(config.Broker)
+	if err != nil {
+		log.Fatal("Failed to create client, ", err)
+	}
 
 	p := pigo.NewPigo()
 	// Unpack the binary file. This will return the number of cascade trees,
@@ -128,11 +137,37 @@ func receive(ctx context.Context, event cloudevents.Event, response *cloudevents
 		log.Fatalf("Detection error: %v", err)
 	}
 
-	_, rects, _ := fd.drawFaces(faces, false)
+	output := make([]box.Box, len(faces))
+	for i, face := range faces {
+		output = append(output, box.Box{
+			Src:     imgPath,
+			ID:      i,
+			Element: "face",
+			X0:      face.Col - face.Scale/2,
+			Y0:      face.Row - face.Scale/2,
+			X1:      face.Scale,
+			Y1:      face.Scale,
+		})
 
-	log.Println(detectionResult{
-		coords: rects,
-	})
+	}
+	for i := 0; i < len(output); i++ {
+		element := output[i].Element
+		//		for _, element := range output[i].Elements {
+		newEvent := cloudevents.NewEvent("1.0")
+		log.Println(event.Context)
+		//newEvent.Context = event.Context.Clone()
+		newEvent.SetType("boundingbox")
+		newEvent.SetID(uuid.New().String())
+		newEvent.SetSource("pigo")
+		newEvent.SetData(output[i])
+		newEvent.SetExtension("element", element)
+		_, _, err = eventsClient.Send(ctx, newEvent)
+		if err != nil {
+			log.Println(err)
+			response.Error(http.StatusInternalServerError, err.Error())
+			return err
+		}
+	}
 
 	response.RespondWith(http.StatusOK, nil)
 	return nil
