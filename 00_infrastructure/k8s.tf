@@ -48,6 +48,7 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
       "https://www.googleapis.com/auth/monitoring",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/devstorage.read_write",
+      "https://www.googleapis.com/auth/datastore",
     ]
   }
 }

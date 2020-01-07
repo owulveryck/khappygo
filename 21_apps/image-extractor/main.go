@@ -102,6 +102,10 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 	newEvent.SetID(uuid.New().String())
 	newEvent.SetSource("image-extractor")
 	newEvent.SetType("image.partial.png")
+	corrID, err := event.Context.GetExtension("correlation")
+	if err != nil {
+		newEvent.SetExtension("correlation", corrID)
+	}
 	newEvent.SetExtension("element", b.Element)
 	newEvent.SetData(imgPath)
 	response.RespondWith(200, &newEvent)

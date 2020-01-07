@@ -15,6 +15,7 @@ import (
 	"cloud.google.com/go/storage"
 	cloudevents "github.com/cloudevents/sdk-go"
 	"github.com/disintegration/imaging"
+	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/owulveryck/khappygo/common/emotions"
 	"github.com/owulveryck/khappygo/common/kclient"
@@ -159,6 +160,7 @@ func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, r
 	emotionT := outputs[0].Data().([]float32)
 	log.Println(emotionT)
 	emotions := emotions.Emotion{
+		Src:       imgPath,
 		Neutral:   emotionT[0],
 		Happiness: emotionT[1],
 		Surprise:  emotionT[2],
@@ -170,8 +172,18 @@ func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, r
 	}
 
 	log.Printf("%#v", emotions)
+	newEvent := cloudevents.NewEvent("1.0")
+	newEvent.SetID(uuid.New().String())
+	newEvent.SetSource("emotion")
+	newEvent.SetDataContentType("application/json")
+	newEvent.SetType("emotion")
+	corrID, err := event.Context.GetExtension("correlation")
+	if err != nil {
+		newEvent.SetExtension("correlation", corrID)
+	}
+	newEvent.SetData(emotions)
+	response.RespondWith(200, &newEvent)
 
-	response.RespondWith(http.StatusOK, nil)
 	return nil
 }
 

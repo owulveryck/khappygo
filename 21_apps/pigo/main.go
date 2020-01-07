@@ -166,6 +166,7 @@ func receive(ctx context.Context, event cloudevents.Event, response *cloudevents
 		newEvent.SetType("boundingbox")
 		newEvent.SetID(uuid.New().String())
 		newEvent.SetSource("pigo")
+		newEvent.SetExtension("correlation", uuid.New().String())
 		newEvent.SetData(output[i])
 		newEvent.SetExtension("element", element)
 		_, _, err = eventsClient.Send(ctx, newEvent)

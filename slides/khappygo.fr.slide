@@ -254,3 +254,11 @@ _Object_Detection_with_Pixel_Intensity_Comparisons_Organized_in_Decision_Trees_
 
 GNU/LINUX Magazine hs 106 - Initiez-vous au machine learning en pratique avec tensorflow et keras
 .image https://boutique.ed-diamond.com/12781-thickbox_default/gnulinux-magazine-hs-106.jpg 250 _
+
+* traces
+
+kubetl proxy
+.link http://localhost:8001/api/v1/namespaces/istio-system/services/zipkin:9411/proxy/zipkin
+
+* ui 
+.link http://localhost:8001/api/v1/namespaces/event-example/services/ui-service/proxy/

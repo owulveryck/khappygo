@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels: &labels
+      app: ui
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      containers:
+        - name: ui
+          image: gcr.io/{{PROJECT_ID}}/ui:{{VERSION}}
+          env:
+          - name: BUCKET
+            value: "gs://khappygo/processed"
+
+---
+
+# Service pointing at the previous Deployment. This will be the target for event
+# consumption.
+  kind: Service
+  apiVersion: v1
+  metadata:
+    name: ui-service
+  spec:
+    selector:
+      app: ui
+    ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+
