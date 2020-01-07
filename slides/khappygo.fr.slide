@@ -101,6 +101,17 @@ _Fer+_ est présent dans le model Zoo
 .image https://raw.githubusercontent.com/Microsoft/FERPlus/master/FER+vsFER.png
 .link https://github.com/microsoft/FERPlus
 
+* Exemple
+
+
+* D'un programme à un logiciel...
+
+* D'un programme à un logiciel...
+
+_Software_engineering_is_what_happens_to_programming_
+_when_you_add_time_and_other_programmers._
+
+.caption Titus Winters in [[https://www.youtube.com/watch?v=tISy7EJQPzI&t=8m17][CppCon 2017]]
 
 * Application design
 
@@ -113,12 +124,22 @@ _Modeling_events_forces_you_to_have_a_temporal_focus_on_what’s_going_on_in_the
 
 ([[https://twitter.com/gregyoung][Greg Young]])
 
+* Domain events
+
+Extrait de la doc [[https://docs.microsoft.com/fr-fr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/domain-events-design-implementation][Domain events design implementation]]
+
+_l’interface_du_bus_d’événements_a_besoin_d’une_infrastructure_permettant_une_communication_entre_processus_et_distribuée_entre_des_services_potentiellement_distants._
+
+_Elle_peut_reposer_sur_un_bus_de_services_commercial,_sur_des_files_d’attente,_
+_sur_une_base_de_données_partagée_utilisée_comme_une_boîte_aux_lettres,_
+_ou_sur_tout_autre_système_de_messagerie_distribué_et_idéalement_basé_sur_les_opérations_d’envoi_(push)._
+
+* Description de l'infrastructure
 * Les évènements
 
 Les évènements sont décrit dans un format indépendant nommé "cloud events".
 
 "cloud events" est une spécification qui permet de décrire les évènements d'une manière agnostique des applications et des cloud providers.
-
 
 .image assets/cloud-events.svg 90 _
 .caption [[https://cloudevents.io/][https://cloudevents.io]]
@@ -157,12 +178,20 @@ Parfois, il rèvent de Serverless.
 
 Extrait du site officiel: _Knative_Eventing_is_a_system_that_is_designed_to_address_a_common_need_for_cloud_native_development_and_provides_composable_primitives_to_enable_late-binding_event_sources_and_event_consumers._
 
-
 * Architecture technique (aka: comment ça marche)
 
 .image knative.svg
 
-* Description des services
+* Montage de l'infrastructure
+
+- Nous installons un cluser k8s grâce à terraform (IaC)
+- Nous installons ensuite le système knative
+
+* let's do it
+
+.iframe http://127.0.0.1:9000/ 600 1300
+
+* Revenons à notre application
 
 * Les services
 
@@ -206,47 +235,10 @@ Les images sont récupérées par un service web "REST" qui les dépose dans le 
 
 - génère des enregistrements dans une base de donnée
 
-* Détail des services AI-Powered
-
-* Principe de fonctionnement général
-
-Nous allons utiliser le système d'échange ONNX pour utiliser des réseaux de neurones pré-entrainés dans nos applications.
-
-* ONNX pour une séparation des logiciels 1.0 et 2.0
-
-* Les applications
-* Langage utilisé: Go
-
-Nous allons coder les applications en utilisant le langage Go.
-
-Comme la "l'intelligence" est portée par les réseaux de neurones (via ONNX), nos applications se contententde:
-
-- traiter les évènements d'entrée
-- de créer les tenseurs
-- d'appliquer le modèle
-- et de générer des réponses ou de nouveaux évènements.
-
 * Code
 
 Le principe de traitement est grandement simplifié grâce à l'uilisation d'onnx.
 .code ../common/machine/machine_test.go /START/,/END/
-
-* Les modèles
-
-* Le modèle pour detecter les visages
-
-Nous utilisons le modèle _YOLO_.
-YOLO est un réseau de neurones qui permet la détection multi-objets.
-
-Ce réseau n'est pas spécifique qux visages, il est capable de reconnaire plusieurs classes d'objets en une seule passe.
-
-Ce réseau à l'avantage d'être particulière rapide à l'execution.
-
-.link https://pjreddie.com/darknet/yolo/
-
-* tests
-
-.link https://console.cloud.google.com/storage/browser/khappygo?hl=fr&project=khappygo
 
 * Vous n'avez pas besoin de deep-learning
 
@@ -255,29 +247,8 @@ _Object_Detection_with_Pixel_Intensity_Comparisons_Organized_in_Decision_Trees_
 => pigo
 
 .link https://arxiv.org/pdf/1305.4537.pdf
-* logos
 
-.image assets/Kubernetes_logo_without_workmark.png 60 _
-.caption Kubernetes
-.image assets/knative-logo.png 60 _
-.caption Knative
-.image assets/ONNX_logo_main.png 60 _
-.caption ONNX
-.image assets/Go-Logo_Blue.png 60 _
-.caption Go
-.image assets/gorgonia.svg 60 _
-.caption Gorgonia
-
-
-* Domain events
-
-Extrait de la doc [[https://docs.microsoft.com/fr-fr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/domain-events-design-implementation][Domain events design implementation]]
-
-l’interface du bus d’événements a besoin d’une infrastructure permettant une communication entre processus et distribuée entre des services potentiellement distants.
-
-Elle peut reposer sur un bus de services commercial, sur des files d’attente,
-sur une base de données partagée utilisée comme une boîte aux lettres,
-ou sur tout autre système de messagerie distribué et idéalement basé sur les opérations d’envoi (push).
+* Conclusions
 
 * Pour aller plus loin
 
