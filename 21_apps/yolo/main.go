@@ -181,6 +181,7 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		newEvent.SetID(uuid.New().String())
 		newEvent.SetSource("yolo")
 		newEvent.SetData(output[i])
+		newEvent.SetExtension("correlationID", uuid.New().String())
 		newEvent.SetExtension("element", element)
 		_, _, err = c.cloudeventsClient.Send(ctx, newEvent)
 		if err != nil {

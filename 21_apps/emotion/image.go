@@ -33,7 +33,7 @@ func GrayToBCHW(img *image.Gray, dst tensor.Tensor) error {
 		for x := 0; x < w; x++ {
 			for y := 0; y < h; y++ {
 				color := img.GrayAt(x, y)
-				err := dst.SetAt(float32(color.Y)/255, 0, 0, y, x)
+				err := dst.SetAt(float32(color.Y), 0, 0, y, x)
 				if err != nil {
 					return err
 				}
@@ -43,7 +43,7 @@ func GrayToBCHW(img *image.Gray, dst tensor.Tensor) error {
 		for x := 0; x < w; x++ {
 			for y := 0; y < h; y++ {
 				color := img.GrayAt(x, y)
-				err := dst.SetAt(float64(color.Y)/255, x, y)
+				err := dst.SetAt(float64(color.Y), x, y)
 				if err != nil {
 					return err
 				}

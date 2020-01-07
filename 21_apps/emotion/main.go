@@ -103,7 +103,15 @@ func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, r
 	width := 64
 	inputT := tensor.New(tensor.WithShape(1, 1, height, width), tensor.Of(tensor.Float32))
 
-	m := imaging.Resize(jpg, height, width, imaging.Lanczos)
+	m := imaging.Resize(jpg, height+30, width+30, imaging.Lanczos)
+
+	// Crop the original image to 300x300px size using the center anchor.
+	m = imaging.CropAnchor(m, height, width, imaging.Center)
+
+	// Create a grayscale version of the image with higher contrast and sharpness.
+	m = imaging.Grayscale(m)
+	m = imaging.AdjustContrast(m, 20)
+	//m = imaging.Sharpen(m, 2)
 
 	var imgGray *image.Gray
 	gray := imaging.Grayscale(m)
@@ -111,7 +119,23 @@ func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, r
 	for i := 0; i < len(imgGray.Pix); i++ {
 		imgGray.Pix[i] = gray.Pix[i*4]
 	}
+	/*
+		out, err := os.Create("/tmp/output.jpg")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		var opt jpeg.Options
 
+		opt.Quality = 80
+		// ok, write out the data into the new JPEG file
+
+		err = jpeg.Encode(out, imgGray, &opt) // put quality to 80%
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	*/
 	err = GrayToBCHW(imgGray, inputT)
 	if err != nil {
 		log.Println(err)
