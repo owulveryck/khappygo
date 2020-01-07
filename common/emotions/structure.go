@@ -2,6 +2,7 @@ package emotions
 
 // Emotion ...
 type Emotion struct {
+	Src       string
 	Neutral   float32
 	Happiness float32
 	Surprise  float32
