@@ -33,7 +33,7 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
   name       = "my-node-pool"
   location   = "europe-west4-b"
   cluster    = google_container_cluster.my_cluster.name
-  node_count = 1
+  node_count = 3
 
   node_config {
     preemptible  = true
