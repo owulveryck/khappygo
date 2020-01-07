@@ -133,6 +133,7 @@ func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, r
 	case outputs = <-job.Output:
 	}
 	emotionT := outputs[0].Data().([]float32)
+	log.Println(emotionT)
 	emotions := emotions.Emotion{
 		Neutral:   emotionT[0],
 		Happiness: emotionT[1],
