@@ -22,7 +22,7 @@ import (
 )
 
 type configuration struct {
-	Angle        float64 `default:"0.8"`
+	Angle        float64 `default:"0.0"`
 	MinSize      int     `default:"20"`
 	MaxSize      int     `default:"1000"`
 	ShiftFactor  float64 `default:"0.1"`
@@ -44,6 +44,7 @@ func main() {
 	if err != nil {
 		log.Fatal(envconfig.Usage("", &config))
 	}
+	log.Printf("%#v", config)
 	log.Println(config.CascadeFile)
 	cascadeURL, err := url.Parse(config.CascadeFile)
 	if err != nil {
@@ -68,19 +69,19 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	rc.Close()
-
-	eventsClient, err = kclient.NewDefaultClient(config.Broker)
-	if err != nil {
-		log.Fatal("Failed to create client, ", err)
-	}
 
 	p := pigo.NewPigo()
 	// Unpack the binary file. This will return the number of cascade trees,
 	// the tree depth, the threshold and the prediction from tree's leaf nodes.
 	classifier, err := p.Unpack(cascadeFile)
+	rc.Close()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	eventsClient, err = kclient.NewDefaultClient(config.Broker)
+	if err != nil {
+		log.Fatal("Failed to create client, ", err)
 	}
 
 	fd = &faceDetector{
@@ -138,17 +139,23 @@ func receive(ctx context.Context, event cloudevents.Event, response *cloudevents
 	}
 
 	output := make([]box.Box, len(faces))
-	for i, face := range faces {
-		output = append(output, box.Box{
-			Src:     imgPath,
-			ID:      i,
-			Element: "face",
-			X0:      face.Col - face.Scale/2,
-			Y0:      face.Row - face.Scale/2,
-			X1:      face.Scale,
-			Y1:      face.Scale,
-		})
+	var qThresh float32 = 5.0
 
+	log.Printf("%#v", faces)
+	for i, face := range faces {
+		if face.Q > qThresh {
+			output = append(output, box.Box{
+				Src:        imgPath,
+				ID:         i,
+				Element:    "face",
+				Confidence: float64(face.Q),
+				X0:         int(float64(face.Col - face.Scale/2)),
+				Y0:         int(float64(face.Row - face.Scale/2)),
+				X1:         int(float64(face.Col + face.Scale/2)),
+				Y1:         int(float64(face.Row + face.Scale/2)),
+			})
+
+		}
 	}
 	for i := 0; i < len(output); i++ {
 		element := output[i].Element
@@ -168,6 +175,7 @@ func receive(ctx context.Context, event cloudevents.Event, response *cloudevents
 			return err
 		}
 	}
+	log.Printf("%#v", output)
 
 	response.RespondWith(http.StatusOK, nil)
 	return nil

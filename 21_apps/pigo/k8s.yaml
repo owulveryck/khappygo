@@ -20,7 +20,7 @@ spec:
           - name: CASCADE_FILE
             value: "gs://khappygo/models/facefinder"
           - name: ANGLE
-            value: "0.8"
+            value: "0.0"
           - name: IOUTHRESHOLD
             value: "0.01"
 

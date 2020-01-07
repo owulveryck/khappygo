@@ -2,7 +2,6 @@ package main
 
 import (
 	"image"
-	"io/ioutil"
 
 	pigo "github.com/esimov/pigo/core"
 	"github.com/fogleman/gg"
@@ -48,11 +47,6 @@ type faceDetector struct {
 	markDetEyes   bool
 }
 
-// detectionResult contains the coordinates of the detected faces and the base64 converted image.
-type detectionResult struct {
-	coords []image.Rectangle
-}
-
 // detectFaces run the detection algorithm over the provided source image.
 func (fd *faceDetector) detectFaces(src *image.NRGBA) ([]pigo.Detection, error) {
 
@@ -75,26 +69,6 @@ func (fd *faceDetector) detectFaces(src *image.NRGBA) ([]pigo.Detection, error) 
 		ShiftFactor: fd.shiftFactor,
 		ScaleFactor: fd.scaleFactor,
 		ImageParams: *imgParams,
-	}
-
-	if fd.puploc {
-		pl := pigo.NewPuplocCascade()
-
-		cascade, err := ioutil.ReadFile(fd.puplocCascade)
-		if err != nil {
-			return nil, err
-		}
-		plc, err = pl.UnpackCascade(cascade)
-		if err != nil {
-			return nil, err
-		}
-
-		if fd.flploc {
-			flpcs, err = pl.ReadCascadeDir(fd.flplocDir)
-			if err != nil {
-				return nil, err
-			}
-		}
 	}
 
 	// Run the classifier over the obtained leaf nodes and return the detection results.
