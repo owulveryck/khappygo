@@ -24,5 +24,9 @@ They are in the present format an best viewed with `github.com/owulveryck/presen
 
 # Result
 
+### Source
+![](21_apps/testdata/nasa.jpg)
+### Result
 ![](imgs/result.png)
+### Traces
 ![](imgs/traces.png)
