@@ -1,4 +1,4 @@
-VERSION=v0.8.8
+VERSION=v0.8.17
 TARGETS=yolo emotion image-extractor pigo report ui
 TARGETSK8S=yolo/k8s.yaml emotion/k8s.yaml image-extractor/k8s.yaml pigo/k8s.yaml report/k8s.yaml ui/k8s.yaml
 .PHONY: $(TARGETS) $(TARGETSK8S)
