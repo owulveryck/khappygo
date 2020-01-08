@@ -29,9 +29,9 @@ _Note_: the code is not fully tested, and probably only works in my environment.
 The goal of this presentation are multiple:
 
 - to show that a ML service can be decoupled (ports and adapters): The business logic (software 2.0) is using ONNX, and the regular part is using software 1.0.
-(see this [my blog post](https://blog.owulveryck.info/2019/08/16/a-simple-face-detection-utility-from-python-to-go.html) for more info)
+(see this [blog post](https://blog.owulveryck.info/2019/08/16/a-simple-face-detection-utility-from-python-to-go.html) for more info)
 - to show how to pass from a program to a software with "domain events" (see [this talk](https://www.youtube.com/watch?v=tISy7EJQPzI&t=8m17s) for the différence)
-- to show how knative eventing is a good support for the services
+- to show how [knative eventing](https://knative.dev/docs/eventing/) is a good support for the services
 - to show how a service can easily replaced by changing the trigger (passing from "yolo" to "pigo" - aka: you don't need deep learning :))
 
 But most of all:
@@ -57,6 +57,11 @@ TODO
 
 #### Deep learning
 The deep learning models are encoded in ONNX and stored using git-lfs. see the [gofaces](https://github.com/owulveryck/gofaces) repo for more info.
+
+Two pre-trained models are used:
+
+- Tiny Yolo v2
+- emotion fer+
 
 #### non deep learning
 
