@@ -21,3 +21,8 @@ git lfs checkout model/model.onnx
 
 The slides are in progress.
 They are in the present format an best viewed with `github.com/owulveryck/present`
+
+# Result
+
+![](imgs/result.png)
+![](imgs/traces.png)
