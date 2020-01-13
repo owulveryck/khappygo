@@ -7,34 +7,28 @@ owulveryck@octo.com
 https://github.com/owulveryck/khappygo
 @owulveryck
 
-* Agenda
-
-- Programmation d'application IA avec onnx et Go
-- Design d'application d'IA avec Knative
-- Ingénierie logicielle d'une application d'IA
-
 * La société "RUH" (Are You Happy?)
 
-Afin de satisfaire le besoin des *retailers* *physiques* d'amélioration de l'expérience utilisateur,
+Afin de satisfaire le besoin d'amélioration de l'expérience utilisateur pour les *retailers* *physiques*,
 
-la société RUH propose un service de *colecte* et d'*analyse* *de* *sentiments* des clients à la sortie du magasin.
+la société RUH propose un service de *collecte* et d'*analyse* *des* *sentiments* des clients à la sortie du magasin.
 
-A la différence des autres produits, ce service ne demande *pas* *d'interractions* avec les clients.
+A la différence des autres produits, ce service ne demande *pas* *d'interaction* avec les clients.
 
 .image assets/sad-4730689_640.png _ 300
 
-* > Une application simple qui detecte les sentiments.
+* > Une application simple qui détecte les sentiments
 
-* le réseau de neurones, et l'application
+* le réseau de neurones et l'application
 
 - La business logique est gérée par un réseau de neurones;
 - L'application se charge des entrées/sorties du réseau de neurones;
-- L'application utilise une couche d'execution pour appliquer les calculs;
+- L'application utilise une couche d'éxécution pour appliquer les calculs;
 
 .image assets/archiSimple1.png
 .caption Source: [[blog.owulveryck.info][blog.owulveryck.info]]
 
-* exemple de parralèle avec le monde Python
+* Parallèle avec le monde Python
 
 - La business logique est codée avec *Kheras*;
 - L'application en *Python* se charge des entrées/sorties;
@@ -54,13 +48,13 @@ A la différence des autres produits, ce service ne demande *pas* *d'interractio
 
 * ONNX
 
-* Neural networks: rappels
+* Réseaux de neurones: rappels
 
 Un exemple classique de couche dans un réseau de neurones est:
 
 $$f(X) = \sigma(W \cdot X+b)$$
 
-* Equations are graphs
+* Les équations sont des graphes
 
 Transformons l'équation suivante...
 $$f(X) = \sigma(W \cdot X+b)$$
@@ -68,27 +62,26 @@ $$f(X) = \sigma(W \cdot X+b)$$
 en une représentation fonctionnelle
 $$f(X) = \sigma(add(mul(W,X),B))$$
 
-* Les equations sont des graphes
+* Les équations sont des graphes (2)
 
+$$f(X) = \sigma(add(mul(W,X),B))$$
 Nous pouvons alors facilement représenter cette équation en tant que graphe:
 
 .image assets/graph1.png
 
-* Conclusion rapide:
+* Synthèse
 
-Un réseau de Neurones est un Graphe dont les feuilles sont des tenseurs et des opérations.
+Un réseau de Neurones est un Graphe dont les feuilles sont des tenseurs ou des opérations.
 
-ONNX est une représentation d'un graphe de calcul exprimé en _protocol_buffers_.
+ONNX est une représentation d'un graphe de calculs exprimée en _protocol_buffers_.
 
-ONNX permet d'encoder un réseau de neurones *et*de*rester*indépendant*des*outils* (Tensorflow, Keras, PyTorch, tvm...).
+ONNX permet d'encoder un réseau de neurones en restant *indépendant*des*outils* (Tensorflow, Keras, PyTorch, ...).
 
 .image assets/ONNX_logo_main.png 60 _
-.caption ONNX
 
-* Collection de modèles pré-entrainés: le Model Zoo
+* Le model zoo
 
-The ONNX Model Zoo is a collection of pre-trained models for state-of-the-art models in deep learning.
-There are available in the ONNX format.
+Le "model zoo" est une collection de modèles pré-entrainés disponibles dans le format ONNX:
 
 .link https://github.com/onnx/models
 
@@ -96,26 +89,33 @@ There are available in the ONNX format.
 
 _Fer+_ est un réseau de convolution profond (DCNN) qui permet de déterminer les sentiments à partir d'une image.
 
-_Fer+_ est présent dans le model Zoo
+_Fer+_ est disponible dans le model Zoo
 
 .image https://raw.githubusercontent.com/Microsoft/FERPlus/master/FER+vsFER.png
 .link https://github.com/microsoft/FERPlus
 
 * Exemple
 
+.background assets/demo-fs8.png
+.html demos/htdocs/emotion/index.html
+
+* Passage à l'échelle?
+
+.image https://pbs.twimg.com/media/EEvWKjLWwAA28eU.png:large
+.caption dilbert by @ScottAdams
 
 * D'un programme à un logiciel...
 
-* D'un programme à un logiciel...
+* L'ingénierie logicielle
 
 _Software_engineering_is_what_happens_to_programming_
 _when_you_add_time_and_other_programmers._
 
 .caption Titus Winters in [[https://www.youtube.com/watch?v=tISy7EJQPzI&t=8m17][CppCon 2017]]
 
-* Application design
+* Conception de l'application
 
-* Un design evenementiel
+* Un design événementiel
 
 Nous considérons que l'application a été conçue en utilisant les principes [[https://www.oreilly.com/library/view/reactive-microsystems/9781491994368/ch04.html][_Events-First_Domain-Driven_Design_.]]
 
@@ -135,11 +135,9 @@ _sur_une_base_de_données_partagée_utilisée_comme_une_boîte_aux_lettres,_
 _ou_sur_tout_autre_système_de_messagerie_distribué_et_idéalement_basé_sur_les_opérations_d’envoi_(push)._
 
 * Description de l'infrastructure
-* Les évènements
+* Les événements
 
-Les évènements sont décrit dans un format indépendant nommé "cloud events".
-
-"cloud events" est une spécification qui permet de décrire les évènements d'une manière agnostique des applications et des cloud providers.
+"Cloud events" est une spécification qui permet de décrire les événements d'une manière agnostique des applications et des cloud providers.
 
 .image assets/cloud-events.svg 90 _
 .caption [[https://cloudevents.io/][https://cloudevents.io]]
@@ -149,56 +147,63 @@ La version 1.0 a été publiée le 24 Octobre 2019.
 : if you want to indicate an event that is significant to your domain, raise this event explicitly and let the other classes in your domain model subscribe and react to it.
 : https://enterprisecraftsmanship.com/posts/domain-events-simple-reliable-solution/
 
-* L'infrastructure d'hébergement: la partie "Ops"
+* L'infrastructure d'hébergement
 
-Extrait de la doc: [[https://docs.microsoft.com/fr-fr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/domain-events-design-implementation][Domain events design implementation]]
+Nous demandons aux ops une infrastructure d'hébergement de nos conteneurs...
 
-_l’interface_du_bus_d’événements_a_besoin_d’une_infrastructure_permettant_une_communication_entre_processus_et_distribuée_entre_des_services_potentiellement_distants._
 
-Nous demandons aux Ops une infrastructure d'hébergement de nos containers... Et forcément, ils proposent:
+Et forcément, ils proposent:
 
-.image assets/Kubernetes_logo_without_workmark.svg 80 _
+.image assets/Kubernetes_logo_without_workmark.svg 100 _
 .caption Kubernetes
 
-* Oui mais...
+* Mais...
 
-Kubernetes est un gros projet, et les devs ont suffisamment de travail sans avoir à se soucier de la gestion de k8s...
+Les devs rêvent de _serverless_.
 
-Parfois, il rèvent de Serverless.
-
-.image https://images.globest.com/contrib/content/uploads/sites/305/2016/07/ch2Data_Center_Empty_0-3.jpg 300 _
+.image https://images.globest.com/contrib/content/uploads/sites/305/2016/07/ch2Data_Center_Empty_0-3.jpg 400 _
 .caption Rare picture of a serverless datacenter - ([[https://www.globest.com/sites/brianjrogal/2017/10/03/chicago-data-center-market-tightens/][source www.globest.com]])
 
-* Une solution DevOps friendly?
+* Une solution DevOps friendly ?
+
+
+[[https://knative.dev/docs/eventing/][Knative Eventing]] est un projet de la _Cloud_Native_Computing_Foundation_ (CNCF).
+
+C'est un ensemble d'extensions posées sur un cluster kubernetes.
 
 .image assets/knative-logo.png 80 _
 .caption Knative
 
-[[https://knative.dev/docs/eventing/][Knative Eventing]] est un projet de la CNCF; c'est un ensemble d'extensions posées sur un cluster kubernetes.
+Extrait de la doc:
 
-Extrait du site officiel: _Knative_Eventing_is_a_system_that_is_designed_to_address_a_common_need_for_cloud_native_development_and_provides_composable_primitives_to_enable_late-binding_event_sources_and_event_consumers._
+_Knative_Eventing_is_a_system_that_is_designed_to_address_a_common_need_for_cloud_native_development_and_provides_composable_primitives_to_enable_late-binding_event_sources_and_event_consumers._
 
-* Architecture technique (aka: comment ça marche)
+* Architecture technique
 
 .image knative.svg
 
 * Montage de l'infrastructure
 
-- Nous installons un cluser k8s grâce à terraform (IaC)
-- Nous installons ensuite le système knative
+Deux étapes:
 
-* let's do it
+- installation d'un cluser `k8s` grâce à terraform (IaC)
+- installation du système `knative`
+
+* Montage
 
 .iframe http://127.0.0.1:9000/ 600 1300
 
-* Revenons à notre application
+* Le logiciel
 
-* Les services
+* Une architecture micro-services
 
-- récupérer les images des clients à la sortie du magasin;
-- extraire les visages depuis les images;
-- extraire les sentiments depuis les images;
-- stocker les sentiments;
+Les services qui composent l'application:
+
+- récupération des images des clients à la sortie du magasin;
+- extraction des visages depuis les images;
+- extraction des sentiments depuis les images;
+- archivage des sentiments;
+- présentation des sentiments;
 
 * La récupération des images
 
@@ -212,7 +217,7 @@ Les images sont récupérées par un service web "REST" qui les dépose dans le 
 
 - lit une image depuis un emplacement sur un bucket Cloud storage,
 - applique un modèle de deep learning pour localiser les visages.
-- génère ensuite _un_évènement_ par visage détecté
+- génère ensuite _un_événement_ par visage détecté
 
 
 * Le service d'extraction des images
@@ -221,7 +226,7 @@ Les images sont récupérées par un service web "REST" qui les dépose dans le 
 
 - lit une image
 - extrait les bounding boxes (les visages)
-- stock les images dans cloud storage
+- emmagasine les images dans cloud storage
 
 * Le service d'analyse de sentiment
 
@@ -229,16 +234,32 @@ Les images sont récupérées par un service web "REST" qui les dépose dans le 
 
 - lit une image de visage
 - extrait les sentiments en appliquant un modèle de deep-learning
-- génère un évènement avec les sentiments
+- génère un événement avec les sentiments
 
 * Le service de reporting
 
-- génère des enregistrements dans une base de donnée
+- génère des enregistrements dans une base de données
 
-* Code
+* Démonstration
 
-Le principe de traitement est grandement simplifié grâce à l'uilisation d'onnx.
-.code ../common/machine/machine_test.go /START/,/END/
+.iframe http://127.0.0.1:9000/ 600 1300
+
+.link http://localhost:8001/api/v1/namespaces/event-example/services/ui-service/proxy/
+
+* Conclusion
+
+
+* Annexes
+
+* Pour aller plus loin
+
+GNU/LINUX Magazine hs 106 - Initiez-vous au machine learning en pratique avec tensorflow et keras
+.image https://boutique.ed-diamond.com/12781-thickbox_default/gnulinux-magazine-hs-106.jpg 350 _
+
+* traces
+
+kubetl proxy
+.link http://localhost:8001/api/v1/namespaces/istio-system/services/zipkin:9411/proxy/zipkin
 
 * Vous n'avez pas besoin de deep-learning
 
@@ -248,17 +269,3 @@ _Object_Detection_with_Pixel_Intensity_Comparisons_Organized_in_Decision_Trees_
 
 .link https://arxiv.org/pdf/1305.4537.pdf
 
-* Conclusions
-
-* Pour aller plus loin
-
-GNU/LINUX Magazine hs 106 - Initiez-vous au machine learning en pratique avec tensorflow et keras
-.image https://boutique.ed-diamond.com/12781-thickbox_default/gnulinux-magazine-hs-106.jpg 250 _
-
-* traces
-
-kubetl proxy
-.link http://localhost:8001/api/v1/namespaces/istio-system/services/zipkin:9411/proxy/zipkin
-
-* ui 
-.link http://localhost:8001/api/v1/namespaces/event-example/services/ui-service/proxy/
