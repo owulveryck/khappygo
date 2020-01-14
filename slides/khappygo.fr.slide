@@ -2,7 +2,7 @@ Khappygo
 Deep learning en production
 
 Olivier Wulveryck
-Consultant
+Consultant Octo Technology Lille
 owulveryck@octo.com
 https://github.com/owulveryck/khappygo
 @owulveryck
@@ -248,6 +248,17 @@ Les images sont récupérées par un service web "REST" qui les dépose dans le 
 
 * Conclusion
 
+* 1
+
+Concevoir des applications IA comme des informaticiens que nous sommes et non comme des data-scientists que nous ne sommes pas
+
+* 2
+
+Utiliser une architecture d'hébergement en adéquation avec le design de l'application
+
+* 3
+
+Favoriser l'utilisation de services managés
 
 * Annexes
 

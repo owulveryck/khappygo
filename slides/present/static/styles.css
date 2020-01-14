@@ -142,6 +142,41 @@
     -moz-transform: translate(0);
     -webkit-transform: translate3d(0, 0, 0);
   }
+  article.current:after{
+    content:url(/assets/footer.png);
+    transform: scale(.6);
+    /*
+    background-image: url(/assets/footer.png);
+    background-size: 10px 20px;
+    content:"";
+    display: inline-block;
+    width: 10px;
+    height: 20px;
+    */
+    position: fixed;
+    left: 280px;
+    bottom: 10px;
+    height: 30px;
+    color: white;
+   }
+  article.current:before{
+    content: "Octo Chti - 2020 - @owulveryck - chti@octo.com";
+    /*
+    background-image: url(/assets/footer.png);
+    background-size: 10px 20px;
+    content:"";
+    display: inline-block;
+    width: 10px;
+    height: 20px;
+    */
+    position: fixed;
+    left: 50px;
+    bottom: 0px;
+    height: 30px;
+    font-family: 'Century Gothic', 'Open Sans', Arial, sans-serif;
+    font-size: 14px;
+    color: #0e2356;
+   }
   .slides > article.next {
     display: block;
     transform: translate(2020px);
@@ -463,11 +498,12 @@ p.link {
 }
 
 .pagenumber {
-  color: #8c8c8c;
-  font-size: 75%;
+  font-family: 'Century Gothic', 'Open Sans', Arial, sans-serif;
+  font-size: 16px;
+  color: #0e2356;
   position: absolute;
-  bottom: 10px;
-  right: 70px;
+  bottom: 8px;
+  right: 15px;
 }
 
 /* Code */
@@ -530,6 +566,12 @@ div.output .buttons {
   margin-top: 20px;
   color: #0e2356;
 }
+.presenter:before {
+   content:url(/assets/qrcode.svg);
+   position:absolute;
+   left:50px;
+   top:450px;
+ }
 .presenter p,
 .presenter .link {
   margin: 0;
