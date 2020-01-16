@@ -1,4 +1,4 @@
-Khappygo
+Gophers all the way down
 Deep learning en production
 
 Olivier Wulveryck
@@ -17,7 +17,7 @@ A la différence des autres produits, ce service ne demande *pas* *d'interaction
 
 .image assets/sad-4730689_640.png _ 300
 
-* > Une application simple qui détecte les sentiments
+* Une application simple qui détecte les sentiments
 
 * le réseau de neurones et l'application
 
@@ -244,7 +244,7 @@ Les images sont récupérées par un service web "REST" qui les dépose dans le 
 
 .iframe http://127.0.0.1:9000/ 600 1300
 
-.link http://localhost:8001/api/v1/namespaces/event-example/services/ui-service/proxy/
+| [[https://console.cloud.google.com/storage/browser/khappygo/processed?project=khappygo&hl=fr][Console Storage]] | [[https://console.cloud.google.com/firestore/data?hl=fr&project=khappygo][Console firestore]] | [[http://localhost:8001/api/v1/namespaces/event-example/services/ui-service/proxy/][Reporting]] | [[http://localhost:8001/api/v1/namespaces/istio-system/services/zipkin:9411/proxy/zipkin][Traces]] |
 
 * Conclusion
 
