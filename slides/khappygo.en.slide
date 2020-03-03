@@ -1,0 +1,286 @@
+Gophers all the way down
+Deep learning en production
+
+Olivier Wulveryck
+Consultant Octo Technology Lille
+owulveryck@octo.com
+https://github.com/owulveryck/khappygo
+@owulveryck
+
+* Use-case: the "RUH" (Are You Happy?) company
+
+Afin de satisfaire le besoin d'amélioration de l'expérience utilisateur pour les *retailers* *physiques*,
+
+la société RUH propose un service de *collecte* et d'*analyse* *des* *sentiments* des clients à la sortie du magasin.
+
+A la différence des autres produits, ce service ne demande *pas* *d'interaction* avec les clients.
+
+.image assets/sad-4730689_640.png _ 300
+
+*  A simple app for feeling analysis
+
+* The neural network and the application
+
+- the business logic is handled by a neural network;
+- the application is dealing with I/O and feeding the neural network;
+- the application is using an execution layer for computing the neural network;
+
+.image assets/archiSimple1.png
+.caption Source: [[blog.owulveryck.info][blog.owulveryck.info]]
+
+* In the Python world this would be used
+
+- Business logic is expressed in *Kheras*;
+- a *Python* app is handling I/O;
+- *Tensorflow* is computing the neural net;
+
+.image assets/archiSimple1.png
+.caption Source: [[blog.owulveryck.info][blog.owulveryck.info]]
+
+* Our application
+
+- business logic is expressed in *Kheras* and exported in *ONNX*;
+- a *Go* application is handling I/O;
+- *Gorgonia* is computing the neural net;
+
+.image assets/archiSimple1.png
+.caption Source: [[blog.owulveryck.info][blog.owulveryck.info]]
+
+* ONNX
+
+* What is a neural net in 3 slides
+
+A typical layer of a neural network is:
+
+$$f(X) = \sigma(W \cdot X+b)$$
+
+* Equations are graphs
+
+Let's turn this equation...
+$$f(X) = \sigma(W \cdot X+b)$$
+
+into its functional representation:
+$$f(X) = \sigma(add(mul(W,X),B))$$
+
+* Equations are graphs (2)
+
+$$f(X) = \sigma(add(mul(W,X),B))$$
+This equation can be represented as a graph:
+
+.image assets/graph1.png
+
+* Conclusion:
+
+A neural network is a graph.
+The vertices of the graph are tensors or operations.
+
+* So ONNX is...
+
+Open Neural Network eXchange (ONNX) is a domain specific language for describing a neural network.
+
+The representation is then serialized in binary thanks to _protocol_buffers_.
+
+Therefore, any language with a protocol buffer compiler can understand the structure of the neural network.
+
+> ONNX is neural network as data
+
+ONNX allows encoding of a neural network while remaining *independant*of*the*tools*and*languages* (Tensorflow, Keras, Pytorch, Go, ...)
+
+.image assets/ONNX_logo_main.png 60 _
+
+* model zoo
+
+The model zoo is a collection of pre-trained neural net models encoded in ONNX
+
+.link https://github.com/onnx/models
+
+* Sentiment analysis: a pre-trained model
+
+_Fer+_ is a deep convolution neural network (DCNN) allowing to extract the feeling of a person from a picture of his face.
+
+_Fer+_ is available in the model zoo.
+
+.image https://raw.githubusercontent.com/Microsoft/FERPlus/master/FER+vsFER.png
+.link https://github.com/microsoft/FERPlus
+
+* Exemple
+
+.background assets/demo-fs8.png
+.html demos/htdocs/emotion/index.html
+
+* Running the POC at scale?
+
+.image https://pbs.twimg.com/media/EEvWKjLWwAA28eU.png:large
+.caption dilbert by @ScottAdams
+
+* From an app to a software
+
+* Software engineering
+
+_Software_engineering_is_what_happens_to_programming_
+_when_you_add_time_and_other_programmers._
+
+.caption Titus Winters in [[https://www.youtube.com/watch?v=tISy7EJQPzI&t=8m17][CppCon 2017]]
+
+* Designing the application
+
+* Event driven design
+
+Let's consider that the design of the application sticks to the principles of [[https://www.oreilly.com/library/view/reactive-microsystems/9781491994368/ch04.html][_Events-First_Domain-Driven_Design_.]]
+
+_When_you_start_modeling_events,_it_forces_you_to_think_about_the_behavior_of_the_system,_as_opposed_to_thinking_about_structure_inside_the_system._
+_Modeling_events_forces_you_to_have_a_temporal_focus_on_what’s_going_on_in_the_system._
+
+([[https://twitter.com/gregyoung][Greg Young]])
+
+* Domain events
+
+Extract from the doc [[https://docs.microsoft.com/fr-fr/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/domain-events-design-implementation][Domain events design implementation]]
+
+_the_event_bus_interface_needs_some_infrastructure_that_allows_inter-process_and_distributed_communication_between_potentially_remote_services._
+
+_It_can_be_based_on_a_commercial_service_bus,_queues,_a_shared_database_used_as_a_mailbox,_
+_or_any_other_distributed_and_ideally_push_based_messaging_system._
+
+* Infrastructure design
+* Events
+
+"Cloud events" is a specification for describing events in a way that is agnostic of the application and/or the cloud providers.
+
+.image assets/cloud-events.svg 90 _
+.caption [[https://cloudevents.io/][https://cloudevents.io]]
+
+version 1.0 has been published on October the 24th 2019.
+
+: if you want to indicate an event that is significant to your domain, raise this event explicitly and let the other classes in your domain model subscribe and react to it.
+: https://enterprisecraftsmanship.com/posts/domain-events-simple-reliable-solution/
+
+*  The hosting infrastructure
+
+We ask the Operation team a hosting infrastructure for our containers...
+
+And their obvious response is:
+
+.image assets/Kubernetes_logo_without_workmark.svg 100 _
+.caption Kubernetes
+
+* But...
+
+The devs are dreaming of _serverless_.
+
+.image https://images.globest.com/contrib/content/uploads/sites/305/2016/07/ch2Data_Center_Empty_0-3.jpg 400 _
+.caption Rare picture of a serverless datacenter - ([[https://www.globest.com/sites/brianjrogal/2017/10/03/chicago-data-center-market-tightens/][source www.globest.com]])
+
+* a DevOps friendly Solution?
+
+[[https://knative.dev/docs/eventing/][Knative Eventing]] is a project of the _Cloud_Native_Computing_Foundation_ (CNCF).
+
+It is a couple of extensions to a Kubernetes cluster.
+
+.image assets/knative-logo.png 80 _
+.caption Knative
+
+Extract from the documentation:
+
+_Knative_Eventing_is_a_system_that_is_designed_to_address_a_common_need_for_cloud_native_development_and_provides_composable_primitives_to_enable_late-binding_event_sources_and_event_consumers._
+
+* Technical overview
+
+.image knative.svg
+
+* Setting up the infrastructure
+
+Two steps:
+
+- Installing a `k8s` cluster thanks to terraform (IaC)
+- Installing the `knative` extensions
+
+* Setup
+
+.iframe http://127.0.0.1:9000/ 600 1300
+
+* The software
+
+* The pattern of micro-services
+
+The services part of the application:
+
+- fetching pictures of clients walking outside of the store;
+- extracting the faces from the pictures;
+- extracting the feelings from the faces;
+- storing the feelings;
+- presenting the feelings;
+
+* Fetching the pictures
+
+Pictures are fetched and stored in Google Cloud Storage thanks to a web service "REST"
+
+.image service1.svg
+
+* Locating faces
+
+.image service2.svg
+
+This service:
+- reads a picture from a bucket on cloud storage,
+- apply a deep learning model to locate the faces,
+- fire an _event_ per face containing the coordinates (bounding boxes),
+
+* The face extraction service
+
+.image service3.svg
+
+- Reads a picture,
+- Extract the sub picture according to the coordinates (bounding boxes).
+- Store each picture in a bucket.
+
+* Feeling analysis
+
+.image service4.svg
+
+- read a picture containing a face
+- extract the feelings by applying a deep learning model
+- fire a new event with the feelings detected
+
+* Reporting
+
+- Create a record for each emotion event inside a database;
+
+* Demo
+
+.iframe http://127.0.0.1:9000/ 600 1300
+
+| [[https://console.cloud.google.com/storage/browser/khappygo/processed?project=khappygo&hl=fr][Console Storage]] | [[https://console.cloud.google.com/firestore/data?hl=fr&project=khappygo][Console firestore]] | [[http://localhost:8001/api/v1/namespaces/event-example/services/ui-service/proxy/][Reporting]] | [[http://localhost:8001/api/v1/namespaces/istio-system/services/zipkin:9411/proxy/zipkin][Traces]] |
+
+* Conclusion
+
+* 1
+
+Let's build IA apps like IT specialists we are and not like data-scientists we are not
+
+* 2
+
+Use a hosting architecture that is coherent with the application design.
+
+* 3
+
+Use managed services to
+
+- keep focus on business value
+- save money from the reinventing capabilities.
+
+* Annexes
+
+* traces
+
+kubetl proxy
+.link http://localhost:8001/api/v1/namespaces/istio-system/services/zipkin:9411/proxy/zipkin
+
+* You don't need deep-learning
+
+_Object_Detection_with_Pixel_Intensity_Comparisons_Organized_in_Decision_Trees_
+
+=> pigo
+
+.link https://arxiv.org/pdf/1305.4537.pdf
+
