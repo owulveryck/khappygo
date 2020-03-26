@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket = "khappygo-infrastructure"
+    bucket = "eventsforcloudrun-next2020-infrastructure"
     prefix = "terraform/state"
   }
 }

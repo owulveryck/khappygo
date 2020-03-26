@@ -6,8 +6,8 @@ then
 fi
 file=$(basename $1)
 #convert $1 -resize x416 -depth 8 -crop 416x416+0+0 /tmp/$file.jpg
-#gsutil cp /tmp/$file.jpg gs://khappygo
-gsutil cp $1 gs://khappygo
+#gsutil cp /tmp/$file.jpg gs://aerobic-botany-270918
+gsutil cp $1 gs://aerobic-botany-270918
 kubectl --namespace event-example exec curl -- curl -v "http://default-broker.event-example.svc.cluster.local" \
   -X POST \
   -H "Ce-Id: test $file" \
@@ -15,7 +15,7 @@ kubectl --namespace event-example exec curl -- curl -v "http://default-broker.ev
   -H "Ce-Type: image.png" \
   -H "Ce-Source: not-sendoff" \
   -H "Content-Type: text/plain" \
-  -d "gs://khappygo/$file"
+  -d "gs://aerobic-botany-270918/$file"
 
 sleep 2
 kubectl --namespace event-example  logs --selector app=emotion

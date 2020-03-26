@@ -19,11 +19,11 @@ resource "google_container_cluster" "my_cluster" {
       issue_client_certificate = false
     }
   }
-  min_master_version = "1.15.4-gke.22"
+  # min_master_version = "1.15.7-gke.23"
 
   addons_config {
     cloudrun_config {
-      disabled = false
+      disabled = true
     }
   }
 }
@@ -37,7 +37,7 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
 
   node_config {
     preemptible  = true
-    machine_type = "n1-standard-4"
+    machine_type = "n1-standard-1"
 
     metadata = {
       disable-legacy-endpoints = "true"

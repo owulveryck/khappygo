@@ -1,3 +1,3 @@
 #!/bin/sh
 
-gsutil -m rsync . gs://khappygo/models/
+gsutil -m rsync . gs://aerobic-botany-270918/models/
