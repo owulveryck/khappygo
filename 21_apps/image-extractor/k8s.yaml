@@ -16,7 +16,7 @@ spec:
           image: gcr.io/{{PROJECT_ID}}/image-extractor:{{VERSION}}
           env:
             - name: DEST
-              value: "gs://khappygo/processed"
+              value: "gs://aerobic-botany-270918/processed"
 
 ---
 

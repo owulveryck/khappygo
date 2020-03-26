@@ -78,6 +78,16 @@ func main() {
 		log.Fatal(err)
 	}
 	kreceiver, err := kclient.NewDefaultClient()
+	t, err := cloudevents.NewHTTPTransport(
+	cloudevents.WithPort(os.Getenv("PORT")),
+	cloudevents.WithPath("/")
+)
+	if err != nil {
+		log.Fatal("Failed to create client, ", err)
+	}
+// or a custom transport: t := &custom.MyTransport{Cool:opts}
+
+kreceiver, err := cloudevents.NewClient(t, opts...)
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
 	}

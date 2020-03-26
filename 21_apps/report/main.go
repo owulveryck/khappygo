@@ -19,7 +19,7 @@ var (
 func main() {
 	ctx := context.Background()
 	var err error
-	client, err = firestore.NewClient(ctx, "khappygo")
+	client, err = firestore.NewClient(ctx, "aerobic-botany-270918")
 	if err != nil {
 		log.Fatal(err)
 

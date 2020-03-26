@@ -16,7 +16,7 @@ spec:
           image: gcr.io/{{PROJECT_ID}}/ui:{{VERSION}}
           env:
           - name: BUCKET
-            value: "gs://khappygo/processed"
+            value: "gs://aerobic-botany-270918/processed"
 
 ---
 

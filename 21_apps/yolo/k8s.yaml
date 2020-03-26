@@ -16,7 +16,7 @@ spec:
           image: gcr.io/{{PROJECT_ID}}/yolo:{{VERSION}}
           env:
           - name: MODEL
-            value: "gs://khappygo/models/faces.onnx"
+            value: "gs://aerobic-botany-270918/models/faces.onnx"
           - name: BROKER
             value: "http://default-broker.event-example.svc.cluster.local"
           - name: CONFIDENCE_THRESHOLD

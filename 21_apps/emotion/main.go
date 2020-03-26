@@ -120,23 +120,6 @@ func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, r
 	for i := 0; i < len(imgGray.Pix); i++ {
 		imgGray.Pix[i] = gray.Pix[i*4]
 	}
-	/*
-		out, err := os.Create("/tmp/output.jpg")
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		var opt jpeg.Options
-
-		opt.Quality = 80
-		// ok, write out the data into the new JPEG file
-
-		err = jpeg.Encode(out, imgGray, &opt) // put quality to 80%
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	*/
 	err = GrayToBCHW(imgGray, inputT)
 	if err != nil {
 		log.Println(err)

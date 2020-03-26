@@ -18,7 +18,7 @@ spec:
           - name: BROKER
             value: "http://default-broker.event-example.svc.cluster.local"
           - name: CASCADE_FILE
-            value: "gs://khappygo/models/facefinder"
+            value: "gs://aerobic-botany-270918/models/facefinder"
           - name: ANGLE
             value: "0.0"
           - name: IOUTHRESHOLD
