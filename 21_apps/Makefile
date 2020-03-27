@@ -11,7 +11,7 @@ $(TARGETS):
 	@echo $@
 	@go build -o /dev/null $@/*.go
 	gcloud builds submit $@ --project ${PROJECT_ID} --tag gcr.io/${PROJECT_ID}/$@:$(VERSION) 2>&1 | grep -A2 "STATUS"
-	gcloud run deploy $@-events --image gcr.io/${PROJECT_ID}/$@:$(VERSION) --allow-unauthenticated
+	gcloud run deploy $@-events --image gcr.io/${PROJECT_ID}/$@:$(VERSION) --allow-unauthenticated --set-env-vars="DEST=gs://aerobix-botany=270918/processed"
 
 
 $(TARGETSK8S):

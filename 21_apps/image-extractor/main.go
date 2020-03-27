@@ -20,11 +20,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/owulveryck/khappygo/common/box"
-	"github.com/owulveryck/khappygo/common/kclient"
 )
 
 type configuration struct {
 	Dest string `envconfig:"dest" required:"true"`
+	Port int    `envconfig:"PORT" default:"8080"`
 }
 
 var (
@@ -32,6 +32,7 @@ var (
 )
 
 func main() {
+
 	err := envconfig.Process("", &config)
 	if err != nil {
 		log.Fatal(envconfig.Usage("", &config))
@@ -41,7 +42,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	kreceiver, err := kclient.NewDefaultClient()
+	t, err := cloudevents.NewHTTPTransport(
+		cloudevents.WithPort(config.Port),
+		cloudevents.WithPath("/"),
+	)
+	// or a custom transport: t := &custom.MyTransport{Cool:opts}
+
+	kreceiver, err := cloudevents.NewClient(t)
+	//	kreceiver, err := kclient.NewDefaultClient()
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
 	}
