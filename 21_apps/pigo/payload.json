@@ -1,0 +1,80 @@
+{
+  "protoPayload": {
+    "@type": "type.googleapis.com/google.cloud.audit.AuditLog",
+    "status": {},
+    "authenticationInfo": {
+      "principalEmail": "owulveryck@octo.com"
+    },
+    "requestMetadata": {
+      "callerIp": "90.110.121.239",
+      "callerSuppliedUserAgent": "apitools gsutil/4.48 Python/2.7.16 (darwin) google-cloud-sdk/286.0.0 analytics/enabled,gzip(gfe)",
+      "requestAttributes": {
+        "time": "2020-04-06T06:19:40.704715404Z",
+        "auth": {}
+      },
+      "destinationAttributes": {}
+    },
+    "serviceName": "storage.googleapis.com",
+    "methodName": "storage.objects.create",
+    "authorizationInfo": [
+      {
+        "resource": "projects/_/buckets/aerobic-botany-270918-input/objects/test4.jpg",
+        "permission": "storage.objects.delete",
+        "granted": true,
+        "resourceAttributes": {}
+      },
+      {
+        "resource": "projects/_/buckets/aerobic-botany-270918-input/objects/test4.jpg",
+        "permission": "storage.objects.create",
+        "granted": true,
+        "resourceAttributes": {}
+      }
+    ],
+    "resourceName": "projects/_/buckets/aerobic-botany-270918-input/objects/test4.jpg",
+    "serviceData": {
+      "@type": "type.googleapis.com/google.iam.v1.logging.AuditData",
+      "policyDelta": {
+        "bindingDeltas": [
+          {
+            "action": "ADD",
+            "role": "roles/storage.legacyObjectOwner",
+            "member": "projectOwner:aerobic-botany-270918"
+          },
+          {
+            "action": "ADD",
+            "role": "roles/storage.legacyObjectOwner",
+            "member": "projectEditor:aerobic-botany-270918"
+          },
+          {
+            "action": "ADD",
+            "role": "roles/storage.legacyObjectOwner",
+            "member": "user:owulveryck@octo.com"
+          },
+          {
+            "action": "ADD",
+            "role": "roles/storage.legacyObjectReader",
+            "member": "projectViewer:aerobic-botany-270918"
+          }
+        ]
+      }
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "us-central1"
+      ]
+    }
+  },
+  "insertId": "ibnnq5e11dvr",
+  "resource": {
+    "type": "gcs_bucket",
+    "labels": {
+      "project_id": "aerobic-botany-270918",
+      "location": "us-central1",
+      "bucket_name": "aerobic-botany-270918-input"
+    }
+  },
+  "timestamp": "2020-04-06T06:19:40.699441534Z",
+  "severity": "INFO",
+  "logName": "projects/aerobic-botany-270918/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "receiveTimestamp": "2020-04-06T06:19:41.726297503Z"
+}

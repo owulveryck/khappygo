@@ -10,15 +10,18 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 
+	gpubsub "cloud.google.com/go/pubsub"
 	"cloud.google.com/go/storage"
 	cloudevents "github.com/cloudevents/sdk-go"
+
+	"github.com/cloudevents/sdk-go/pkg/cloudevents/transport/pubsub"
 	pigo "github.com/esimov/pigo/core"
 	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/owulveryck/khappygo/common/box"
-	"github.com/owulveryck/khappygo/common/kclient"
 )
 
 type configuration struct {
@@ -29,7 +32,7 @@ type configuration struct {
 	ScaleFactor  float64 `default:"1.1"`
 	IOUThreshold float64 `default:"0.01"`
 	CascadeFile  string  `envconfig:"cascade_file" required:"true"`
-	Broker       string  `envconfig:"broker" required:"true"`
+	Port         int     `envconfig:"PORT" default:"8080"`
 }
 
 var (
@@ -78,8 +81,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	pubsubClient, err := gpubsub.NewClient(ctx, "aerobic-botany-270918")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	eventsClient, err = kclient.NewDefaultClient(config.Broker)
+	tr, err := pubsub.New(ctx, pubsub.WithClient(pubsubClient), pubsub.WithTopicIDFromDefaultEnv())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	eventsClient, err = cloudevents.NewClient(tr)
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
 	}
@@ -99,7 +111,12 @@ func main() {
 		markDetEyes:   false,
 	}
 
-	kreceiver, err := kclient.NewDefaultClient()
+	t, err := cloudevents.NewHTTPTransport(
+		cloudevents.WithPort(config.Port),
+	)
+	// or a custom transport: t := &custom.MyTransport{Cool:opts}
+
+	kreceiver, err := cloudevents.NewClient(t)
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
 	}
@@ -109,14 +126,23 @@ func main() {
 }
 
 func receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
-	log.Println(event)
-	var imgPath string
-	err := event.DataAs(&imgPath)
+	log.Println("received event: " + event.Type() + " " + event.Source() + " " + event.Subject())
+	var payload eventProtoPayload
+	err := event.DataAs(&payload)
 	if err != nil {
 		log.Println(err)
-		response.Error(http.StatusBadRequest, "expected data to be a string")
-		return errors.New("expected data to be a string")
+		response.Error(http.StatusBadRequest, "expected data to be a ProtoPayload")
+		return errors.New("expected data to be a ProtoPayload")
 	}
+	if payload.ProtoPayload.ServiceName != "storage.googleapis.com" &&
+		payload.ProtoPayload.MethodName != "storage.objects.create" {
+		return nil
+	}
+	if filepath.Ext(payload.ProtoPayload.ResourceName) != ".jpg" {
+		return nil
+	}
+	rplcr := strings.NewReplacer("projects/_/buckets/", "gs://", "objects/", "")
+	imgPath := rplcr.Replace(payload.ProtoPayload.ResourceName)
 	log.Println(imgPath)
 	rc, err := getElement(ctx, imgPath)
 	if err != nil {
@@ -158,10 +184,13 @@ func receive(ctx context.Context, event cloudevents.Event, response *cloudevents
 		}
 	}
 	for i := 0; i < len(output); i++ {
+		if output[i].Src == "" {
+			continue
+		}
 		element := output[i].Element
 		//		for _, element := range output[i].Elements {
 		newEvent := cloudevents.NewEvent("1.0")
-		log.Println(event.Context)
+		//log.Println(event.Context)
 		//newEvent.Context = event.Context.Clone()
 		newEvent.SetType("boundingbox")
 		newEvent.SetID(uuid.New().String())
@@ -169,6 +198,7 @@ func receive(ctx context.Context, event cloudevents.Event, response *cloudevents
 		newEvent.SetExtension("correlation", uuid.New().String())
 		newEvent.SetData(output[i])
 		newEvent.SetExtension("element", element)
+		log.Println("Sending event: ", newEvent)
 		_, _, err = eventsClient.Send(ctx, newEvent)
 		if err != nil {
 			log.Println(err)
@@ -176,13 +206,13 @@ func receive(ctx context.Context, event cloudevents.Event, response *cloudevents
 			return err
 		}
 	}
-	log.Printf("%#v", output)
 
 	response.RespondWith(http.StatusOK, nil)
 	return nil
 }
 
 func getElement(ctx context.Context, imgPath string) (io.ReadCloser, error) {
+	log.Println(imgPath)
 	imgPath = strings.Trim(imgPath, `"`)
 	imageURL, err := url.Parse(imgPath)
 	if err != nil {
@@ -191,10 +221,13 @@ func getElement(ctx context.Context, imgPath string) (io.ReadCloser, error) {
 	switch imageURL.Scheme {
 	case "gs":
 		bucket := imageURL.Host
+		if filepath.Ext(imageURL.Path) != ".jpg" {
+			return nil, errors.New("not a jpg file:" + imageURL.Path)
+		}
 		object := strings.Trim(imageURL.Path, "/")
 		return storageClient.Bucket(bucket).Object(object).NewReader(ctx)
 	case "file":
 		return os.Open(imageURL.Host + imageURL.Path)
 	}
-	return nil, nil
+	return nil, errors.New("unsupported sheme")
 }
