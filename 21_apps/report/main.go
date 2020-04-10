@@ -33,15 +33,20 @@ func main() {
 
 // Receive ...
 func Receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
-	var emotions emotions.Emotion
-	log.Println(event)
-	log.Println(event.Data)
-	err := event.DataAs(&emotions)
+	data, err := event.DataBytes()
 	if err != nil {
 		log.Println(err)
-		response.Error(http.StatusBadRequest, "expected data to be an emotion ")
-		return errors.New("expected data to be an emotion")
+		response.Error(http.StatusBadRequest, err.Error())
+		return err
 	}
+	var emotions emotions.Emotion
+	err = unmarshalData(data, &emotions)
+	if err != nil {
+		log.Println(err)
+		response.Error(http.StatusBadRequest, "expected data to be a emotion")
+		return errors.New("expected data to be a emotion")
+	}
+	log.Println("Storing: ", emotions)
 	_, _, err = client.Collection("khappygo").Add(ctx, emotions)
 	if err != nil {
 		log.Println(err)

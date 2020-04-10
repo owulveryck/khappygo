@@ -138,6 +138,9 @@ func receive(ctx context.Context, event cloudevents.Event, response *cloudevents
 		payload.ProtoPayload.MethodName != "storage.objects.create" {
 		return nil
 	}
+	if !strings.Contains(payload.ProtoPayload.ResourceName, "-input") {
+		return nil
+	}
 	if filepath.Ext(payload.ProtoPayload.ResourceName) != ".jpg" {
 		return nil
 	}

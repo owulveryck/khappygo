@@ -17,7 +17,6 @@ import (
 	"cloud.google.com/go/storage"
 	cloudevents "github.com/cloudevents/sdk-go"
 	"github.com/disintegration/imaging"
-	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/owulveryck/khappygo/common/box"
 )
@@ -66,15 +65,26 @@ type carrier struct {
 }
 
 func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
-	var b box.Box
-	err := event.DataAs(&b)
+	data, err := event.DataBytes()
 	if err != nil {
 		log.Println(err)
-		response.Error(http.StatusBadRequest, "expected data to be a string")
-		return errors.New("expected data to be a string")
+		response.Error(http.StatusBadRequest, err.Error())
+		return err
 	}
+	var b box.Box
+	err = unmarshalData(data, &b)
+	if err != nil {
+		log.Println(err)
+		response.Error(http.StatusBadRequest, "expected data to be a box")
+		return errors.New("expected data to be a box")
+	}
+	log.Println(b)
 	filename := filepath.Base(b.Src)
 	var extension = filepath.Ext(filename)
+	if extension != ".jpg" {
+		log.Println("Not a jpg file")
+		return nil
+	}
 	var name = filename[0 : len(filename)-len(extension)]
 
 	rc, err := c.getElement(ctx, b.Src)
@@ -105,18 +115,21 @@ func (c *carrier) receive(ctx context.Context, event cloudevents.Event, response
 		response.Error(http.StatusInternalServerError, "save picture"+err.Error())
 		return err
 	}
+	response.RespondWith(200, nil)
 
-	newEvent := cloudevents.NewEvent()
-	newEvent.SetID(uuid.New().String())
-	newEvent.SetSource("image-extractor")
-	newEvent.SetType("image.partial.png")
-	corrID, err := event.Context.GetExtension("correlation")
-	if err != nil {
-		newEvent.SetExtension("correlation", corrID)
-	}
-	newEvent.SetExtension("element", b.Element)
-	newEvent.SetData(imgPath)
-	response.RespondWith(200, &newEvent)
+	/*
+		newEvent := cloudevents.NewEvent()
+		newEvent.SetID(uuid.New().String())
+		newEvent.SetSource("image-extractor")
+		newEvent.SetType("image.partial.png")
+		corrID, err := event.Context.GetExtension("correlation")
+		if err != nil {
+			newEvent.SetExtension("correlation", corrID)
+		}
+		newEvent.SetExtension("element", b.Element)
+		newEvent.SetData(imgPath)
+		response.RespondWith(200, &newEvent)
+	*/
 	return nil
 }
 func (c *carrier) getElement(ctx context.Context, imgPath string) (io.ReadCloser, error) {
@@ -135,7 +148,6 @@ func (c *carrier) getElement(ctx context.Context, imgPath string) (io.ReadCloser
 	return nil, nil
 }
 func (c *carrier) postElement(ctx context.Context, imgPath string) (io.WriteCloser, error) {
-	log.Println(imgPath)
 	imageURL, err := url.Parse(imgPath)
 	if err != nil {
 		return nil, err
@@ -144,6 +156,7 @@ func (c *carrier) postElement(ctx context.Context, imgPath string) (io.WriteClos
 	case "gs":
 		bucket := imageURL.Host
 		object := strings.Trim(imageURL.Path, "/")
+		log.Printf("Saving %v in %v\n", object, bucket)
 		return c.storageClient.Bucket(bucket).Object(object).NewWriter(ctx), nil
 	case "file":
 		return os.Create(filepath.Join(imageURL.Host, imageURL.Path))

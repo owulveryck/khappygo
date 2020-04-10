@@ -10,21 +10,24 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 
+	gpubsub "cloud.google.com/go/pubsub"
 	"cloud.google.com/go/storage"
 	cloudevents "github.com/cloudevents/sdk-go"
+	"github.com/cloudevents/sdk-go/pkg/cloudevents/transport/pubsub"
 	"github.com/disintegration/imaging"
 	"github.com/google/uuid"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/owulveryck/khappygo/common/emotions"
-	"github.com/owulveryck/khappygo/common/kclient"
 	"github.com/owulveryck/khappygo/common/machine"
 	"gorgonia.org/tensor"
 )
 
 type configuration struct {
 	Model string `envconfig:"model" required:"true"`
+	Port  int    `envconfig:"PORT" default:"8080"`
 }
 
 var (
@@ -56,7 +59,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	kreceiver, err := kclient.NewDefaultClient()
+	t, err := cloudevents.NewHTTPTransport(
+		cloudevents.WithPort(config.Port),
+		cloudevents.WithPath("/"),
+	)
+	// or a custom transport: t := &custom.MyTransport{Cool:opts}
+
+	kreceiver, err := cloudevents.NewClient(t)
 	if err != nil {
 		log.Fatal("Failed to create client, ", err)
 	}
@@ -67,8 +76,24 @@ func main() {
 	}
 	rc.Close()
 
+	pubsubClient, err := gpubsub.NewClient(ctx, "aerobic-botany-270918")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tr, err := pubsub.New(ctx, pubsub.WithClient(pubsubClient), pubsub.WithTopicIDFromDefaultEnv())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	eventsClient, err := cloudevents.NewClient(tr)
+	if err != nil {
+		log.Fatal("Failed to create client, ", err)
+	}
+
 	ep := &EventProcessor{
-		Machine: machine,
+		Machine:      machine,
+		eventsClient: eventsClient,
 	}
 
 	log.Println("emotion is listening for events")
@@ -77,19 +102,34 @@ func main() {
 
 // EventProcessor ...
 type EventProcessor struct {
-	Machine *machine.ModelMachine
+	Machine      *machine.ModelMachine
+	eventsClient cloudevents.Client
 }
 
 // Receive ...
 func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, response *cloudevents.EventResponse) error {
-	var imgPath string
-	err := event.DataAs(&imgPath)
+	log.Println("received event: " + event.Type() + " " + event.Source() + " " + event.Subject())
+	var payload eventProtoPayload
+	err := event.DataAs(&payload)
 	if err != nil {
 		log.Println(err)
-		response.Error(http.StatusBadRequest, "expected data to be a string")
-		return errors.New("expected data to be a string")
+		response.Error(http.StatusBadRequest, "expected data to be a ProtoPayload")
+		return errors.New("expected data to be a ProtoPayload")
 	}
+	if payload.ProtoPayload.ServiceName != "storage.googleapis.com" &&
+		payload.ProtoPayload.MethodName != "storage.objects.create" {
+		return nil
+	}
+	if !strings.Contains(payload.ProtoPayload.ResourceName, "-faces") {
+		return nil
+	}
+	if filepath.Ext(payload.ProtoPayload.ResourceName) != ".jpg" {
+		return nil
+	}
+	rplcr := strings.NewReplacer("projects/_/buckets/", "gs://", "objects/", "")
+	imgPath := rplcr.Replace(payload.ProtoPayload.ResourceName)
 	log.Println(imgPath)
+
 	rc, err := getElement(ctx, imgPath)
 	if err != nil {
 		log.Println(err)
@@ -165,7 +205,13 @@ func (e *EventProcessor) Receive(ctx context.Context, event cloudevents.Event, r
 		newEvent.SetExtension("correlation", corrID)
 	}
 	newEvent.SetData(emotions)
-	response.RespondWith(200, &newEvent)
+	_, _, err = e.eventsClient.Send(ctx, newEvent)
+	if err != nil {
+		log.Println(err)
+		response.Error(http.StatusInternalServerError, err.Error())
+		return err
+	}
+	response.RespondWith(200, nil)
 
 	return nil
 }
