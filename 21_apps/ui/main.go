@@ -70,7 +70,7 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println(vars)
 	image := vars["key"]
 	log.Println(image)
-	bucketRdr, err := storageClient.Bucket("aerobic-botany-270918").Object("processed/" + image).NewReader(r.Context())
+	bucketRdr, err := storageClient.Bucket("aerobic-botany-270918-faces").Object(image).NewReader(r.Context())
 	if err != nil {
 		log.Println(err)
 		return
@@ -121,7 +121,7 @@ func newDisplayable(elements map[string]interface{}) displayable {
 	s := newSentiments(elements)
 	sort.Sort(s)
 	return displayable{
-		Image: strings.Replace(strings.Replace(elements["Src"].(string), "gs://aerobic-botany-270918/processed", "images", 1), `"`, ``, -1),
+		Image: strings.Replace(strings.Replace(elements["Src"].(string), "gs://aerobic-botany-270918-faces", "images", 1), `"`, ``, -1),
 		Desc:  fmt.Sprintf("%v\n%v", []sentiment(s)[0], []sentiment(s)[1]),
 	}
 }
